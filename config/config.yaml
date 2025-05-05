@@ -1,0 +1,11 @@
+defaults:
+  - preprocessing: fft_filter
+  - model: gnn
+  - _self_
+
+batch_size: 128
+num_epochs: 50
+seed: 42
+learning_rate: 1e-3
+# training specific override over command line possible via python ... "attr=new_value"
+prefetch_dataset: False

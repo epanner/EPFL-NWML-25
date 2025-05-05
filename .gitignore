@@ -1,5 +1,7 @@
 # Exclude data directory
 /data/
+/content/
+/wandb/
 
 # Python bytecode
 __pycache__/
