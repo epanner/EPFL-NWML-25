@@ -1,15 +1,17 @@
-import datetime
+from datetime import datetime
 from pathlib import Path
 import hydra
 from hydra.utils import instantiate
 import pandas as pd
+import torch
 from model.gnn import EEGGNN
-from preprocessing import PREPROCESSING_REGISTRY
+from preprocessing.preprocessing import PREPROCESSING_REGISTRY
 from functools import reduce
 from omegaconf import DictConfig
 from seiz_eeg.dataset import EEGDataset
 import wandb
-import lightning as pl
+import lightning.pytorch as pl
+from lightning.pytorch.loggers import WandbLogger
 from torch.utils.data import DataLoader
 
 def compose_transforms(transforms):
@@ -23,27 +25,26 @@ def instantiate_preprocessing(cfg_step):
     return cls(**cfg_step)
 
 
-@hydra.main(config_path="config", config_name="config")
+@hydra.main(config_path="config", config_name="config", version_base="1.1")
 def main(cfg: DictConfig):
     pl.seed_everything(cfg.seed)
 
-    transforms = [instantiate_preprocessing(step) for step in cfg.preprocessing]
+    transforms = [instantiate_preprocessing(step) for step in cfg.preprocessing.steps]
     transform_fn = compose_transforms(transforms)
     
     # TODO this could also all added to the config
-    data_path = "/content/networkML"
-    DATA_ROOT = Path(data_path)
-    clips_tr = pd.read_parquet(DATA_ROOT / "train/train/segments.parquet")
+    DATA_ROOT = Path(cfg.data_path)
+    clips_tr = pd.read_parquet(DATA_ROOT / cfg.train_set / "segments.parquet")
 
     dataset_tr = EEGDataset(
         clips_tr,
-        signals_root=DATA_ROOT / "train",
+        signals_root=DATA_ROOT / cfg.train_set,
         signal_transform=transform_fn,
         prefetch=cfg.prefetch_dataset
     )
     
     wandb.init(project="eeg-gnn", config=dict(cfg))
-    wandb_logger = pl.loggers.WandbLogger(project="nml-project", config=dict(cfg))
+    wandb_logger = WandbLogger(project="nml-project", config=dict(cfg))
 
 
     
@@ -67,14 +68,14 @@ def main(cfg: DictConfig):
     )
 
     trainer.fit(model, loader_tr)
-    wandb.save(checkpoint_callback.best_model_path)
+    wandb.save(checkpoint_callback.best_model_path) #TODO auto logging
 
-    clips_te = pd.read_parquet(DATA_ROOT / "test/test/segments.parquet")
+    clips_te = pd.read_parquet(DATA_ROOT / cfg.test_set / "segments.parquet")
 
     dataset_te = EEGDataset(
         clips_te,  # Your test clips variable
         signals_root=DATA_ROOT
-        / "test",  # Update this path if your test signals are stored elsewhere
+        / cfg.test_set,  # Update this path if your test signals are stored elsewhere
         signal_transform=transform_fn,  # You can change or remove the signal_transform as needed
         prefetch=cfg.prefetch_dataset,  # Set to False if prefetching causes memory issues on your compute environment
         return_id=True,  # Return the id of each sample instead of the label
@@ -85,8 +86,8 @@ def main(cfg: DictConfig):
     all_predictions = []
     all_ids = []
 
-    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #model.to(device)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
 
     with torch.no_grad():
         for batch in loader_te:

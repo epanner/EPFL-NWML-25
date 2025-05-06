@@ -35,3 +35,16 @@ class EEGGNN(pl.LightningModule):
     def configure_optimizers(self):
         optimizer_class = getattr(torch.optim, self.optimizer_name) #raises a error!
         return optimizer_class(self.parameters(), lr=self.lr)
+    
+    # Spatial then temporal
+    # GNN(GAN, GCNConv, GraphTransformer, Graphspectral, FlatVector) -> (LSTM/GRU, BI-LSTM/GRU, Transformer)
+
+    # Was muss noch gemacht werden?
+    # - Graph einlesen
+    # - Configuration ändern -> klomplette Klasse für eine Modelkonfiguration!(Veit)
+    # - Metrics zur Klasse hinzufügen(Veit)
+    # - Chatgpt fragen welche Elememte
+    #   - beste zuerst implementieren
+    #   - Transformer -> 
+    #   - BI-LSTM -> 
+    #

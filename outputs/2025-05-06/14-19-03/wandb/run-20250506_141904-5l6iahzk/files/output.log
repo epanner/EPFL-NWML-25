@@ -1,0 +1,97 @@
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loggers/wandb.py:397: There is a wandb run already in progress and newly created instances of `WandbLogger` will reuse this run. If this is not desired, call `wandb.finish()` before instantiating `WandbLogger`.
+
+  | Name  | Type       | Params | Mode
+---------------------------------------------
+0 | convs | ModuleList | 9.6 K  | train
+1 | fc    | Linear     | 65     | train
+---------------------------------------------
+9.7 K     Trainable params
+0         Non-trainable params
+9.7 K     Total params
+0.039     Total estimated model params size (MB)
+11        Modules in train mode
+0         Modules in eval mode
+/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+Epoch 0:   0%|                                                                                                                | 0/102 [00:00<?, ?it/s]
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/main.py", line 70, in main
+    trainer.fit(model, loader_tr)
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 561, in fit
+    call._call_and_handle_interrupt(
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py", line 48, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 599, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path)
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 1012, in _run
+    results = self._run_stage()
+              ^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 1056, in _run_stage
+    self.fit_loop.run()
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py", line 216, in run
+    self.advance()
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py", line 455, in advance
+    self.epoch_loop.run(self._data_fetcher)
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/training_epoch_loop.py", line 150, in run
+    self.advance(data_fetcher)
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/training_epoch_loop.py", line 320, in advance
+    batch_output = self.automatic_optimization.run(trainer.optimizers[0], batch_idx, kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/automatic.py", line 192, in run
+    self._optimizer_step(batch_idx, closure)
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/automatic.py", line 270, in _optimizer_step
+    call._call_lightning_module_hook(
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py", line 176, in _call_lightning_module_hook
+    output = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/core/module.py", line 1302, in optimizer_step
+    optimizer.step(closure=optimizer_closure)
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/core/optimizer.py", line 154, in step
+    step_output = self._strategy.optimizer_step(self._optimizer, closure, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/strategies/strategy.py", line 239, in optimizer_step
+    return self.precision_plugin.optimizer_step(optimizer, model=model, closure=closure, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/plugins/precision/precision.py", line 123, in optimizer_step
+    return optimizer.step(closure=closure, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/torch/optim/optimizer.py", line 485, in wrapper
+    out = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/torch/optim/optimizer.py", line 79, in _use_grad
+    ret = func(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/torch/optim/adam.py", line 225, in step
+    loss = closure()
+           ^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/plugins/precision/precision.py", line 109, in _wrap_closure
+    closure_result = closure()
+                     ^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/automatic.py", line 146, in __call__
+    self._result = self.closure(*args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/automatic.py", line 131, in closure
+    step_output = self._step_fn()
+                  ^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loops/optimization/automatic.py", line 319, in _training_step
+    training_step_output = call._call_strategy_hook(trainer, "training_step", *kwargs.values())
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py", line 328, in _call_strategy_hook
+    output = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/strategies/strategy.py", line 391, in training_step
+    return self.lightning_module.training_step(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/model/gnn.py", line 30, in training_step
+    logits = self(x.x, x.edge_index)
+                  ^^^
+AttributeError: 'Tensor' object has no attribute 'x'
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

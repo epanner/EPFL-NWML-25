@@ -1,0 +1,15 @@
+{"time":"2025-05-06T14:12:47.886965254+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-06/14-12-46/wandb/run-20250506_141247-1ob40min/logs/debug-core.log"}
+{"time":"2025-05-06T14:12:48.337277302+02:00","level":"INFO","msg":"created new stream","id":"1ob40min"}
+{"time":"2025-05-06T14:12:48.337369847+02:00","level":"INFO","msg":"stream: started","id":"1ob40min"}
+{"time":"2025-05-06T14:12:48.337559879+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"1ob40min"}
+{"time":"2025-05-06T14:12:48.337649144+02:00","level":"INFO","msg":"sender: started","stream_id":"1ob40min"}
+{"time":"2025-05-06T14:12:48.33772951+02:00","level":"INFO","msg":"handler: started","stream_id":"1ob40min"}
+{"time":"2025-05-06T14:12:48.625380546+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-06T14:12:48.808327847+02:00","level":"INFO","msg":"stream: closing","id":"1ob40min"}
+{"time":"2025-05-06T14:12:48.808392248+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-06T14:12:48.808501939+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-06T14:12:50.22204691+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-06T14:12:50.63087795+02:00","level":"INFO","msg":"handler: closed","stream_id":"1ob40min"}
+{"time":"2025-05-06T14:12:50.63102278+02:00","level":"INFO","msg":"sender: closed","stream_id":"1ob40min"}
+{"time":"2025-05-06T14:12:50.63100031+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"1ob40min"}
+{"time":"2025-05-06T14:12:50.63114037+02:00","level":"INFO","msg":"stream: closed","id":"1ob40min"}

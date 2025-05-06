@@ -1,3 +1,4 @@
+_class_: spatial_temporal
 hidden_channels: 64
 num_layers: 3
 dropout: 0.2

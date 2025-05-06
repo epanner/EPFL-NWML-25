@@ -1,11 +1,16 @@
 defaults:
   - preprocessing: fft_filter
   - model: gnn
+  - optimizer: adam
   - _self_
 
 batch_size: 128
-num_epochs: 50
+num_epochs: 4
 seed: 42
 learning_rate: 1e-3
 # training specific override over command line possible via python ... "attr=new_value"
 prefetch_dataset: False
+data_path: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML"
+train_set: "train/train"
+test_set: "test/test"
+distances_set: "distances_3d.csv"

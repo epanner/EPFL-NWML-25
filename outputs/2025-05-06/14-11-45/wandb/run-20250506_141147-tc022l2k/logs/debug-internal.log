@@ -1,0 +1,15 @@
+{"time":"2025-05-06T14:11:47.272719311+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-06/14-11-45/wandb/run-20250506_141147-tc022l2k/logs/debug-core.log"}
+{"time":"2025-05-06T14:11:47.779776219+02:00","level":"INFO","msg":"created new stream","id":"tc022l2k"}
+{"time":"2025-05-06T14:11:47.779868239+02:00","level":"INFO","msg":"stream: started","id":"tc022l2k"}
+{"time":"2025-05-06T14:11:47.779966511+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"tc022l2k"}
+{"time":"2025-05-06T14:11:47.780070241+02:00","level":"INFO","msg":"handler: started","stream_id":"tc022l2k"}
+{"time":"2025-05-06T14:11:47.780020603+02:00","level":"INFO","msg":"sender: started","stream_id":"tc022l2k"}
+{"time":"2025-05-06T14:11:48.142269433+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-06T14:11:48.326523557+02:00","level":"INFO","msg":"stream: closing","id":"tc022l2k"}
+{"time":"2025-05-06T14:11:48.326682895+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-06T14:11:48.326733743+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-06T14:11:49.703285807+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-06T14:11:50.216142409+02:00","level":"INFO","msg":"handler: closed","stream_id":"tc022l2k"}
+{"time":"2025-05-06T14:11:50.216345782+02:00","level":"INFO","msg":"sender: closed","stream_id":"tc022l2k"}
+{"time":"2025-05-06T14:11:50.216285188+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"tc022l2k"}
+{"time":"2025-05-06T14:11:50.216446688+02:00","level":"INFO","msg":"stream: closed","id":"tc022l2k"}
