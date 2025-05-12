@@ -7,7 +7,7 @@ import math
 
 from torchmetrics import Accuracy, ConfusionMatrix, F1Score, MetricCollection, Precision, Recall
 
-debug_mode_flag = True
+debug_mode_flag = False
 
 class PositionalEncoding(nn.Module):
 
@@ -19,7 +19,8 @@ class PositionalEncoding(nn.Module):
         div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
         pe = torch.zeros(max_len, 1, d_model)
         pe[:, 0, 0::2] = torch.sin(position * div_term)
-        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        n_odd = d_model // 2
+        pe[:, 0, 1::2] = torch.cos(position * div_term[:n_odd])
         self.register_buffer('pe', pe)
 
     def forward(self, x: Tensor) -> Tensor:
@@ -123,6 +124,7 @@ class EEGTransformerNet(nn.Module):
         ### Transformer Encoder Module
         x = x.permute(2, 0, 1) # output shape: (seq_len, batch_size, F1*D)
         seq_len_transformer, batch_size_transformer, channels_transformer = x.shape
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         x = torch.cat((torch.zeros((seq_len_transformer, batch_size_transformer, 1), 
                                    requires_grad=True).to(device), x), 2)
         x = x.permute(2, 1, 0) # ouptut shape: (channels+1, batch_size, seq_len). seq_len is seen as the embedding size
@@ -153,7 +155,7 @@ class EEGGNN(pl.LightningModule):
             F1=self.cfg.F1,
             D=self.cfg.D,
             eegnet_kernel_size=self.cfg.eegnet_kernel_size,
-            eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
+            # eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
             eegnet_pooling_1=self.cfg.eegnet_pooling_1,
             eegnet_pooling_2=self.cfg.eegnet_pooling_2,
             dropout_eegnet=self.cfg.dropout_eegnet,

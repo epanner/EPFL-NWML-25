@@ -1,0 +1,22 @@
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_setup.py:_flush():68] Current SDK version is 0.19.10
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_setup.py:_flush():68] Configure stats pid to 24856
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_setup.py:_flush():68] Loading settings from /home/veit/.config/wandb/settings
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_setup.py:_flush():68] Loading settings from /home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/18-04-47/wandb/settings
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_init.py:setup_run_log_directory():724] Logging user logs to /home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/18-04-47/wandb/run-20250512_180453-c2mwunoi/logs/debug.log
+2025-05-12 18:04:53,784 INFO    MainThread:24856 [wandb_init.py:setup_run_log_directory():725] Logging internal logs to /home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/18-04-47/wandb/run-20250512_180453-c2mwunoi/logs/debug-internal.log
+2025-05-12 18:04:53,785 INFO    MainThread:24856 [wandb_init.py:init():852] calling init triggers
+2025-05-12 18:04:53,785 INFO    MainThread:24856 [wandb_init.py:init():857] wandb.init called with sweep_config: {}
+config: {'preprocessing': {'steps': [{'_target_': 'github_filter', 'lowcut': 0.5, 'highcut': 120.0, 'fs': 1024, 'resampleFS': 250}]}, 'model': {'F1': 32, 'D': 2, 'eegnet_kernel_size': 32, 'eegnet_separable_kernel_size': 16, 'eegnet_pooling_1': 8, 'eegnet_pooling_2': 4, 'dropout_eegnet': 0.3, 'MSA_num_heads': 4, 'transformer_dim_feedforward': 2048, 'num_transformer_layers': 6, 'flag_positional_encoding': True, 'num_eeg_channels': 19, 'optimizer': {'lr': 0.0001}, 'scheduler': {'step_size': 10, 'gamma': 0.1}}, 'dataset': {'data_path': '/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML', 'train_set': 'train/train', 'test_set': 'test/test', 'distances_set': 'distances_3d.csv'}, 'train': {'max_epochs': 1000, 'batch_size': 1024, 'seed': 42, 'prefetch_dataset': False}, 'early_stopping': {'monitor': 'val_loss', 'patience': 50}, 'checkpoint': {'monitor': 'val_loss', 'save_top_k': 1}, '_wandb': {}}
+2025-05-12 18:04:53,785 INFO    MainThread:24856 [wandb_init.py:init():893] starting backend
+2025-05-12 18:04:53,785 INFO    MainThread:24856 [wandb_init.py:init():897] sending inform_init request
+2025-05-12 18:04:53,788 INFO    MainThread:24856 [backend.py:_multiprocessing_setup():101] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-05-12 18:04:53,788 INFO    MainThread:24856 [wandb_init.py:init():907] backend started and connected
+2025-05-12 18:04:53,790 INFO    MainThread:24856 [wandb_init.py:init():1002] updated telemetry
+2025-05-12 18:04:53,795 INFO    MainThread:24856 [wandb_init.py:init():1026] communicating run to backend with 90.0 second timeout
+2025-05-12 18:04:54,511 INFO    MainThread:24856 [wandb_init.py:init():1101] starting run threads in backend
+2025-05-12 18:04:54,670 INFO    MainThread:24856 [wandb_run.py:_console_start():2566] atexit reg
+2025-05-12 18:04:54,671 INFO    MainThread:24856 [wandb_run.py:_redirect():2414] redirect: wrap_raw
+2025-05-12 18:04:54,671 INFO    MainThread:24856 [wandb_run.py:_redirect():2483] Wrapping output streams.
+2025-05-12 18:04:54,671 INFO    MainThread:24856 [wandb_run.py:_redirect():2506] Redirects installed.
+2025-05-12 18:04:54,673 INFO    MainThread:24856 [wandb_init.py:init():1147] run started, returning control to user process

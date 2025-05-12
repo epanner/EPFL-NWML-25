@@ -11,6 +11,7 @@ transformer_dim_feedforward: 2048   # feedforward dimension in transformer layer
 num_transformer_layers: 6           # number of stacked transformer encoder layers
 flag_positional_encoding: true      # enable positional encoding
 num_eeg_channels: 19
+sequence_length: 3000               # time_window * resampleFS
 
 optimizer:
   lr: 1e-4
