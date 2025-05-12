@@ -1,0 +1,7 @@
+{"time":"2025-05-12T15:48:56.948515201+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/15-48-34/wandb/run-20250512_154856-gordi9nu/logs/debug-core.log"}
+{"time":"2025-05-12T15:48:57.325950258+02:00","level":"INFO","msg":"created new stream","id":"gordi9nu"}
+{"time":"2025-05-12T15:48:57.326006954+02:00","level":"INFO","msg":"stream: started","id":"gordi9nu"}
+{"time":"2025-05-12T15:48:57.326066645+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"gordi9nu"}
+{"time":"2025-05-12T15:48:57.326111185+02:00","level":"INFO","msg":"handler: started","stream_id":"gordi9nu"}
+{"time":"2025-05-12T15:48:57.326168974+02:00","level":"INFO","msg":"sender: started","stream_id":"gordi9nu"}
+{"time":"2025-05-12T15:48:58.058807905+02:00","level":"INFO","msg":"Starting system monitor"}

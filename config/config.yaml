@@ -1,16 +1,32 @@
 defaults:
-  - preprocessing: fft_filter
-  - model: gnn
-  - optimizer: adam
+  - preprocessing: github_filter
+  - model: eeg_net
   - _self_
 
-batch_size: 128
-num_epochs: 4
-seed: 42
-learning_rate: 1e-3
-# training specific override over command line possible via python ... "attr=new_value"
-prefetch_dataset: False
-data_path: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML"
-train_set: "train/train"
-test_set: "test/test"
-distances_set: "distances_3d.csv"
+dataset:
+  data_path: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML"
+  train_set: "train/train"
+  test_set: "test/test"
+  distances_set: "distances_3d.csv"
+  # segment_interval: 4                 # seconds per segment
+  # resample_fs: 250                    # sampling rate used elsewhere
+  # sequence_length: 1000               # segment_interval * resample_fs
+
+# TODO was ist das resample fs und das mit dem Segment kann sein das ich das falsch mache?
+
+# Training settings
+train:
+  max_epochs: 1000
+  batch_size: 1024
+  seed: 42
+  prefetch_dataset: False # If you have enough ram you can switch to true
+
+# Early stopping
+early_stopping:
+  monitor: "val_loss"
+  patience: 50
+
+# Checkpointing
+checkpoint:
+  monitor: "val_loss"
+  save_top_k: 1

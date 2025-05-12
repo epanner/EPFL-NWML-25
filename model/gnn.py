@@ -2,8 +2,6 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 import lightning as pl
-import numpy as np
-from scipy import signal
 
 class EEGGNN(pl.LightningModule):
     def __init__(self, cfg):

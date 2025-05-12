@@ -4,7 +4,8 @@ import hydra
 from hydra.utils import instantiate
 import pandas as pd
 import torch
-from model.gnn import EEGGNN
+# from model.gnn import EEGGNN
+from model.eeg_transformer import EEGGNN
 from preprocessing.preprocessing import PREPROCESSING_REGISTRY
 from functools import reduce
 from omegaconf import DictConfig
@@ -27,22 +28,20 @@ def instantiate_preprocessing(cfg_step):
 
 @hydra.main(config_path="config", config_name="config", version_base="1.1")
 def main(cfg: DictConfig):
-    pl.seed_everything(cfg.seed)
+    pl.seed_everything(cfg.train.seed)
 
     transforms = [instantiate_preprocessing(step) for step in cfg.preprocessing.steps]
     transform_fn = compose_transforms(transforms)
     
-    # TODO this could also all added to the config
-    DATA_ROOT = Path(cfg.data_path)
-    clips_tr = pd.read_parquet(DATA_ROOT / cfg.train_set / "segments.parquet")
+    DATA_ROOT = Path(cfg.dataset.data_path)
+    clips_tr = pd.read_parquet(DATA_ROOT / cfg.dataset.train_set / "segments.parquet")
 
     dataset_tr = EEGDataset(
         clips_tr,
-        signals_root=DATA_ROOT / cfg.train_set,
+        signals_root=DATA_ROOT / cfg.dataset.train_set,
         signal_transform=transform_fn,
-        prefetch=cfg.prefetch_dataset
+        prefetch=cfg.train.prefetch_dataset
     )
-    
     wandb.init(project="eeg-gnn", config=dict(cfg))
     wandb_logger = WandbLogger(project="nml-project", config=dict(cfg))
 
@@ -52,35 +51,39 @@ def main(cfg: DictConfig):
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath="checkpoints",
         filename=f"best-checkpoint-{timestamp}",
-        save_top_k=1,
         verbose=True,
-        monitor="train_loss",
+        monitor=cfg.checkpoint.monitor,
+        save_top_k=cfg.checkpoint.save_top_k,
         mode="min"
     )
+    early_stop_cb = pl.callbacks.EarlyStopping(monitor=cfg.early_stopping.monitor,
+                                               patience=cfg.early_stopping.patience)
+
     
-    loader_tr = DataLoader(dataset_tr, batch_size=cfg.batch_size, shuffle=True)
-    model = EEGGNN(cfg)
+    loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True)
+    model = EEGGNN(cfg.model)
 
     trainer = pl.Trainer(
-        max_epochs=cfg.num_epochs,
+        max_epochs=cfg.train.num_epochs,
         logger=wandb_logger,
-        callbacks=[checkpoint_callback]
+        callbacks=[checkpoint_callback, early_stop_cb],
+        gradient_clip_val=cfg.gradient_clip_val,
     )
 
     trainer.fit(model, loader_tr)
     wandb.save(checkpoint_callback.best_model_path) #TODO auto logging
 
-    clips_te = pd.read_parquet(DATA_ROOT / cfg.test_set / "segments.parquet")
+    clips_te = pd.read_parquet(DATA_ROOT / cfg.dataset.test_set / "segments.parquet")
 
     dataset_te = EEGDataset(
         clips_te,  # Your test clips variable
         signals_root=DATA_ROOT
-        / cfg.test_set,  # Update this path if your test signals are stored elsewhere
+        / cfg.dataset.test_set,  # Update this path if your test signals are stored elsewhere
         signal_transform=transform_fn,  # You can change or remove the signal_transform as needed
-        prefetch=cfg.prefetch_dataset,  # Set to False if prefetching causes memory issues on your compute environment
+        prefetch=cfg.train.prefetch_dataset,  # Set to False if prefetching causes memory issues on your compute environment
         return_id=True,  # Return the id of each sample instead of the label
     )
-    loader_te = DataLoader(dataset_te, batch_size=cfg.batch_size, shuffle=True)
+    loader_te = DataLoader(dataset_te, batch_size=cfg.train.batch_size, shuffle=True)
 
     model.eval()
     all_predictions = []

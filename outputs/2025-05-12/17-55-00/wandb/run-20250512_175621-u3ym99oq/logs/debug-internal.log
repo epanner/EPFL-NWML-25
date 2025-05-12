@@ -1,0 +1,7 @@
+{"time":"2025-05-12T17:56:21.278059713+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/17-55-00/wandb/run-20250512_175621-u3ym99oq/logs/debug-core.log"}
+{"time":"2025-05-12T17:56:21.55291797+02:00","level":"INFO","msg":"created new stream","id":"u3ym99oq"}
+{"time":"2025-05-12T17:56:21.553240115+02:00","level":"INFO","msg":"stream: started","id":"u3ym99oq"}
+{"time":"2025-05-12T17:56:21.553460314+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"u3ym99oq"}
+{"time":"2025-05-12T17:56:21.553509217+02:00","level":"INFO","msg":"handler: started","stream_id":"u3ym99oq"}
+{"time":"2025-05-12T17:56:21.553471506+02:00","level":"INFO","msg":"sender: started","stream_id":"u3ym99oq"}
+{"time":"2025-05-12T17:56:21.886333879+02:00","level":"INFO","msg":"Starting system monitor"}

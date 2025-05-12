@@ -11,6 +11,7 @@ lightning
 torch
 torchvision
 torch-geometric
+torchmetrics
 
 hydra-core
 wandb

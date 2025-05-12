@@ -1,0 +1,23 @@
+preprocessing:
+  steps:
+  - _target_: github_filter
+    lowcut: 0.5
+    highcut: 120.0
+    fs: 1024
+    resampleFS: 250
+model:
+  _class_: spatial_temporal
+  hidden_channels: 64
+  num_layers: 3
+  dropout: 0.2
+optimizer:
+  name: Adam
+batch_size: 128
+num_epochs: 4
+seed: 42
+learning_rate: 0.001
+prefetch_dataset: false
+data_path: /home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML
+train_set: train/train
+test_set: test/test
+distances_set: distances_3d.csv

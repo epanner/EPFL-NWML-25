@@ -1,11 +1,7 @@
-from abc import ABC, abstractmethod
 import numpy as np
 from scipy import signal
-
-class Preprocessing(ABC):
-    @abstractmethod
-    def __call__(self, x: np.ndarray) -> np.ndarray:
-        pass
+from preprocessing.utils import Preprocessing
+from preprocessing.preprocessing_github import GitHubFilter
 
 class FFTFilter(Preprocessing):
     def __init__(self, filter_order, low_freq, high_freq, fs):
@@ -26,4 +22,5 @@ class Identity(Preprocessing):
 PREPROCESSING_REGISTRY = {
     "fft_filter": FFTFilter,
     "identity": Identity,
+    "github_filter": GitHubFilter
 }
