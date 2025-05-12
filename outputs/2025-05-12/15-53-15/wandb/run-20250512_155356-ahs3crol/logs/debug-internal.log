@@ -1,7 +1,0 @@
-{"time":"2025-05-12T15:53:56.917109571+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/15-53-15/wandb/run-20250512_155356-ahs3crol/logs/debug-core.log"}
-{"time":"2025-05-12T15:53:57.19540902+02:00","level":"INFO","msg":"created new stream","id":"ahs3crol"}
-{"time":"2025-05-12T15:53:57.195510723+02:00","level":"INFO","msg":"stream: started","id":"ahs3crol"}
-{"time":"2025-05-12T15:53:57.195596034+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"ahs3crol"}
-{"time":"2025-05-12T15:53:57.195679267+02:00","level":"INFO","msg":"sender: started","stream_id":"ahs3crol"}
-{"time":"2025-05-12T15:53:57.195766686+02:00","level":"INFO","msg":"handler: started","stream_id":"ahs3crol"}
-{"time":"2025-05-12T15:53:57.524575112+02:00","level":"INFO","msg":"Starting system monitor"}

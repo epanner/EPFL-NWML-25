@@ -21,6 +21,7 @@ env.bak/
 venv.bak/
 .python-version
 .conda/
+output/
 
 # Distribution / packaging
 dist/

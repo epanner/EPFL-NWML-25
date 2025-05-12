@@ -1,7 +1,0 @@
-{"time":"2025-05-12T18:12:32.239329701+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/outputs/2025-05-12/18-09-54/wandb/run-20250512_181232-zosokvri/logs/debug-core.log"}
-{"time":"2025-05-12T18:12:32.503940572+02:00","level":"INFO","msg":"created new stream","id":"zosokvri"}
-{"time":"2025-05-12T18:12:32.503998154+02:00","level":"INFO","msg":"stream: started","id":"zosokvri"}
-{"time":"2025-05-12T18:12:32.504039458+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"zosokvri"}
-{"time":"2025-05-12T18:12:32.504117886+02:00","level":"INFO","msg":"sender: started","stream_id":"zosokvri"}
-{"time":"2025-05-12T18:12:32.504215832+02:00","level":"INFO","msg":"handler: started","stream_id":"zosokvri"}
-{"time":"2025-05-12T18:12:32.847681411+02:00","level":"INFO","msg":"Starting system monitor"}
