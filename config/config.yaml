@@ -4,7 +4,7 @@ defaults:
   - _self_
 
 dataset:
-  data_path: "content/networkML"
+  data_path: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML"
   train_set: "train/train"
   test_set: "test/test"
   distances_set: "distances_3d.csv"
