@@ -7,7 +7,7 @@ import math
 
 from torchmetrics import Accuracy, ConfusionMatrix, F1Score, MetricCollection, Precision, Recall
 
-debug_mode_flag = False
+debug_mode_flag = True
 
 class PositionalEncoding(nn.Module):
 
@@ -51,6 +51,8 @@ class EEGNet(nn.Module):
 
     def forward(self, x):
         # x.shape = (B, 1, C, L)
+        if debug_mode_flag: print('Shape of x before block1 of EEGNet: ', x.shape)
+
         x = self.block1(x)
 
         # x.shape = (B, F1, C, L)
@@ -112,6 +114,8 @@ class EEGTransformerNet(nn.Module):
         )
 
     def forward(self, x):
+        if debug_mode_flag: print('Shape of x before EEGNet of EEGTransformerNet: ', x.shape)
+
         # TODO switch here dimensions because it is build for a different dataset
         x = torch.permute(x, (0, 2, 1))
         # input x shape: (batch_size, num_channels, seq_len) = (batch_size, 22, 1000)
@@ -123,6 +127,7 @@ class EEGTransformerNet(nn.Module):
         # print('Shape of x after EEGNet: ', x.shape)
         x = torch.squeeze(x) ## output shape is (Batch size, F1*D, L//pool_1//pool2))
 
+        if debug_mode_flag: print('Shape of x after EEGNet of EEGTransformerNet: ', x.shape)
         ### Transformer Encoder Module
         x = x.permute(2, 0, 1) # output shape: (seq_len, batch_size, F1*D)
         seq_len_transformer, batch_size_transformer, channels_transformer = x.shape
