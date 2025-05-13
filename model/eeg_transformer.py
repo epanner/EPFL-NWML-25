@@ -7,7 +7,7 @@ import math
 
 from torchmetrics import Accuracy, ConfusionMatrix, F1Score, MetricCollection, Precision, Recall
 
-debug_mode_flag = True
+debug_mode_flag = False
 
 class PositionalEncoding(nn.Module):
 
