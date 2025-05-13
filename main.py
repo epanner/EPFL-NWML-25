@@ -42,8 +42,13 @@ def main(cfg: DictConfig):
         signal_transform=transform_fn,
         prefetch=cfg.train.prefetch_dataset
     )
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")                                                                                                                              
+                                                                                                                                                                                  
     wandb.init(project="eeg-gnn", config=dict(cfg))
     wandb_logger = WandbLogger(project="nml-project", config=dict(cfg))
+
 
 
     
@@ -90,7 +95,6 @@ def main(cfg: DictConfig):
     all_predictions = []
     all_ids = []
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
     with torch.no_grad():
