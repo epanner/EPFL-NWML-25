@@ -99,7 +99,7 @@ class EEGTransformerNet(nn.Module):
         self.eegnet = EEGNet(eeg_chans=eeg_chans, F1=F1, eegnet_kernel_size=eegnet_kernel_size, D=D, 
                              eegnet_pooling_1=eegnet_pooling_1, eegnet_pooling_2=eegnet_pooling_2, dropout=dropout_eegnet)
         self.linear = nn.Linear(self.sequence_length_transformer, nb_classes)
-        
+         
         self.flag_positional_encoding = flag_positional_encoding
         self.pos_encoder = PositionalEncoding(self.sequence_length_transformer, dropout=dropout_positional_encoding)
         self.transformer_encoder_layer = nn.TransformerEncoderLayer(

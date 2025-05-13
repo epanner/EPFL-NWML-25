@@ -10,6 +10,7 @@ from preprocessing.preprocessing import PREPROCESSING_REGISTRY
 from functools import reduce
 from omegaconf import DictConfig
 from seiz_eeg.dataset import EEGDataset
+from sklearn.model_selection import train_test_split
 import wandb
 import lightning.pytorch as pl
 from lightning.pytorch.loggers import WandbLogger
@@ -36,12 +37,32 @@ def main(cfg: DictConfig):
     DATA_ROOT = Path(cfg.dataset.data_path)
     clips_tr = pd.read_parquet(DATA_ROOT / cfg.dataset.train_set / "segments.parquet")
 
-    dataset_tr = EEGDataset(
+    # TODO Wie weit muss man ins Fenster davor und danach schauen gerade auch fürs Kurven glätten relevant oder?
+    # Oder schaut keiner in mehrere Fenster?!
+
+    clips_train, clips_val = train_test_split(
         clips_tr,
+        test_size=0.2,        # 20% for validation
+        random_state=cfg.train.seed,
+        shuffle=True,
+        stratify=clips_tr['label']  # if you have a label column
+    )
+
+
+    dataset_tr = EEGDataset(
+        clips_train,
         signals_root=DATA_ROOT / cfg.dataset.train_set,
         signal_transform=transform_fn,
         prefetch=cfg.train.prefetch_dataset
     )
+
+    dataset_vl = EEGDataset(
+        clips_val,
+        signals_root=DATA_ROOT / cfg.dataset.train_set,
+        signal_transform=transform_fn,
+        prefetch=cfg.train.prefetch_dataset
+    )
+   
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")                                                                                                                              
@@ -65,7 +86,9 @@ def main(cfg: DictConfig):
                                                patience=cfg.early_stopping.patience)
 
     
-    loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True)
+    loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True, num_workers=11)
+    loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=True, num_workers=11)
+
     model = EEGGNN(cfg.model)
 
     trainer = pl.Trainer(
@@ -74,9 +97,10 @@ def main(cfg: DictConfig):
         log_every_n_steps=5,
         callbacks=[checkpoint_callback, early_stop_cb],
         gradient_clip_val=cfg.train.gradient_clip_val,
+        num_sanity_val_steps=2
     )
 
-    trainer.fit(model, loader_tr)
+    trainer.fit(model, loader_tr, loader_vl)
     wandb.save(checkpoint_callback.best_model_path) #TODO auto logging
 
     clips_te = pd.read_parquet(DATA_ROOT / cfg.dataset.test_set / "segments.parquet")
