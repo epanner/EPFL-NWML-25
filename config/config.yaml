@@ -4,7 +4,7 @@ defaults:
   - _self_
 
 dataset:
-  data_path: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML"
+  data_path: "content/networkML"
   train_set: "train/train"
   test_set: "test/test"
   distances_set: "distances_3d.csv"
@@ -20,6 +20,7 @@ train:
   batch_size: 1024
   seed: 42
   prefetch_dataset: False # If you have enough ram you can switch to true
+  gradient_clip_val: 0.5  
 
 # Early stopping
 early_stopping:

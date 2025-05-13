@@ -112,6 +112,8 @@ class EEGTransformerNet(nn.Module):
         )
 
     def forward(self, x):
+        # TODO switch here dimensions because it is build for a different dataset
+        x = torch.permute(x, (0, 2, 1))
         # input x shape: (batch_size, num_channels, seq_len) = (batch_size, 22, 1000)
         x = torch.unsqueeze(x, 1)
         # x = x.permute(0, 2, 3, 1)  # similar to Keras Permute layer
@@ -192,7 +194,7 @@ class EEGGNN(pl.LightningModule):
         self.train_metrics.update(preds, y)
         return loss
     
-    def training_epoch_end(self):
+    def on_training_epoch_end(self):
         metrics = self.train_metrics.compute()
         self.log_dict(metrics)
         self.train_metrics.reset()
@@ -205,7 +207,7 @@ class EEGGNN(pl.LightningModule):
         preds = logits.argmax(dim=1)
         self.val_metrics.update(preds, y)
 
-    def validation_epoch_end(self):
+    def on_validation_epoch_end(self):
         metrics = self.val_metrics.compute()
         self.log_dict(metrics)
         self.val_metrics.reset()
@@ -218,7 +220,7 @@ class EEGGNN(pl.LightningModule):
         preds = logits.argmax(dim=1)
         self.test_metrics.update(preds, y)
 
-    def test_epoch_end(self):
+    def on_test_epoch_end(self):
         metrics = self.test_metrics.compute()
         self.log_dict(metrics)
         self.test_metrics.reset()
@@ -228,8 +230,8 @@ class EEGGNN(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.cfg.optimizer.lr)
         scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
-            step_size=self.cfg.scheduler.STEPLR_period,
-            gamma=self.cfg.scheduler.STEPLR_gamma
+            step_size=self.cfg.scheduler.step_size,
+            gamma=self.cfg.scheduler.gamma
         )
         return {'optimizer': optimizer, 'lr_scheduler': scheduler}
 

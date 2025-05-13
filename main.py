@@ -64,10 +64,11 @@ def main(cfg: DictConfig):
     model = EEGGNN(cfg.model)
 
     trainer = pl.Trainer(
-        max_epochs=cfg.train.num_epochs,
+        max_epochs=cfg.train.max_epochs,
         logger=wandb_logger,
+        log_every_n_steps=5,
         callbacks=[checkpoint_callback, early_stop_cb],
-        gradient_clip_val=cfg.gradient_clip_val,
+        gradient_clip_val=cfg.train.gradient_clip_val,
     )
 
     trainer.fit(model, loader_tr)
