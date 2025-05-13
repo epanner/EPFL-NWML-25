@@ -87,7 +87,7 @@ def main(cfg: DictConfig):
 
     
     loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True, num_workers=11)
-    loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=True, num_workers=11)
+    loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False, num_workers=11)
 
     model = EEGGNN(cfg.model)
 
