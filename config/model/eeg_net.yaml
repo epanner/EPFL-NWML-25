@@ -1,10 +1,10 @@
 # Model architecture parameters
-F1: 16 #16                             # number of temporal filters
+F1: 16                              # number of temporal filters
 D: 2                                # spatial filter multiplier
-eegnet_kernel_size: 16 #32 do they depend on F1 size?             # temporal convolution kernel length
-eegnet_separable_kernel_size: 8 #16    # separable convolution kernel length
-eegnet_pooling_1: 4 # 8                 # first pooling window
-eegnet_pooling_2: 2 # 4                 # second pooling window
+eegnet_kernel_size: 32 # do they depend on F1 size?             # temporal convolution kernel length
+eegnet_separable_kernel_size: 16    # separable convolution kernel length
+eegnet_pooling_1: 8                 # first pooling window
+eegnet_pooling_2: 4                 # second pooling window
 dropout_eegnet: 0.3                 # dropout probability in EEGNet
 # TODO in the github repo they used 4 heads but the problem is seq len 3000 creates odd numbers of layers -> one idea would be padding!
 MSA_num_heads: 3                    # multi-head self-attention heads

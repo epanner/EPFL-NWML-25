@@ -17,7 +17,7 @@ dataset:
 # Training settings
 train:
   max_epochs: 1000
-  batch_size: 256
+  batch_size: 512 #Original 1048
   seed: 42
   prefetch_dataset: False # If you have enough ram you can switch to true
   gradient_clip_val: 0.5  
