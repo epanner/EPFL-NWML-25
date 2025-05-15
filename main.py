@@ -26,30 +26,28 @@ def main(cfg: DictConfig):
 
     # TODO Wie weit muss man ins Fenster davor und danach schauen gerade auch fürs Kurven glätten relevant oder?
     # Oder schaut keiner in mehrere Fenster?!
+    if not cfg.train.comp_mode:
+        clips_tr, clips_val = train_test_split(
+            clips_tr,
+            test_size=0.2,        # 20% for validation
+            random_state=cfg.train.seed,
+            shuffle=True,
+            stratify=clips_tr['label']  # if you have a label column
+        )
 
-    clips_train, clips_val = train_test_split(
-        clips_tr,
-        test_size=0.2,        # 20% for validation
-        random_state=cfg.train.seed,
-        shuffle=True,
-        stratify=clips_tr['label']  # if you have a label column
-    )
-
-
-    dataset_tr = EEGDataset(
-        clips_train,
-        signals_root=DATA_ROOT / cfg.dataset.train_set,
-        signal_transform=transform_fn,
-        prefetch=cfg.train.prefetch_dataset
-    )
-
-    dataset_vl = EEGDataset(
-        clips_val,
-        signals_root=DATA_ROOT / cfg.dataset.train_set,
-        signal_transform=transform_fn,
-        prefetch=cfg.train.prefetch_dataset
-    )
+        dataset_vl = EEGDataset(
+            clips_val,
+            signals_root=DATA_ROOT / cfg.dataset.train_set,
+            signal_transform=transform_fn,
+            prefetch=cfg.train.prefetch_dataset
+        )
    
+    dataset_tr = EEGDataset(
+        clips_tr,
+        signals_root=DATA_ROOT / cfg.dataset.train_set,
+        signal_transform=transform_fn,
+        prefetch=cfg.train.prefetch_dataset
+    )
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")                                                                                                                              
@@ -62,16 +60,17 @@ def main(cfg: DictConfig):
         dirpath="checkpoints",
         filename=f"best-checkpoint-{timestamp}",
         verbose=True,
-        monitor=cfg.checkpoint.monitor,
+        monitor=cfg.checkpoint.monitor_comp_mode if cfg.train.comp_mode else cfg.checkpoint.monitor,
         save_top_k=cfg.checkpoint.save_top_k,
         mode="min"
     )
-    early_stop_cb = pl.callbacks.EarlyStopping(monitor=cfg.early_stopping.monitor,
+    early_stop_cb = pl.callbacks.EarlyStopping(monitor=cfg.early_stopping.monitor_comp_mode if cfg.train.comp_mode else cfg.early_stopping.monitor,
                                                patience=cfg.early_stopping.patience)
 
     
     loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True)#, num_workers=11)
-    loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
+    if not cfg.train.comp_mode:
+        loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
 
     model = EEGGNN(cfg.model)
 
@@ -84,7 +83,7 @@ def main(cfg: DictConfig):
         num_sanity_val_steps=2
     )
 
-    trainer.fit(model, loader_tr, loader_vl)
+    trainer.fit(model, loader_tr, loader_vl if not cfg.train.comp_mode else None)
     wandb.save(checkpoint_callback.best_model_path) #TODO auto logging
 
     generate_submission(cfg, model, transform_fn=transform_fn)
