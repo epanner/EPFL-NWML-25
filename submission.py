@@ -1,4 +1,5 @@
 
+import os
 import hydra
 import torch
 from seiz_eeg.dataset import EEGDataset
@@ -38,20 +39,29 @@ def generate_submission(cfg, model, transform_fn=None):
     model.to(device)
 
     with torch.no_grad():
-        for batch in enumerate(tqdm(loader_te)):
+        for batch in loader_te:
+        # for batch in enumerate(tqdm(loader_te)):
             x_batch, x_ids = batch
             x_batch = x_batch.float().to(device)
             logits = model(x_batch)
-            predictions = (logits > 0).int().cpu().numpy()
+            # predictions = (logits > 0).int().cpu().numpy()
+            # print(logits)
+            predictions = logits.argmax(dim=1)
             all_predictions.extend(predictions.flatten().tolist())
             all_ids.extend(list(x_ids))
-            print(f"    → total IDs so far={len(all_ids)}, total preds so far={len(all_predictions)}")
+            # print(f"    → total IDs so far={len(all_ids)}, total preds so far={len(all_predictions)}")
 
     print(f"Final count — IDs: {len(all_ids)}, Predictions: {len(all_predictions)}")
     # Create a DataFrame for Kaggle submission with the required format: "id,label"
+    # WORKAROUND problem is dataloader sets between each char in id string a _
+    all_ids = list(map(lambda s: s[::2], all_ids))
     submission_df = pd.DataFrame({"id": all_ids, "label": all_predictions})
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
     # Save the DataFrame to a CSV file without an index
+    try:
+        os.mkdir("submission")
+    except Exception as e:
+        print(f"An error occurred: {e}")    
     submission_df.to_csv(f"submission/submission_seed_{now}.csv", index=False)
     OmegaConf.save(cfg, f"submission/config_{now}.yaml")
 
