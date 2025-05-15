@@ -60,8 +60,8 @@ def main(cfg: DictConfig):
     if not cfg.train.comp_mode:
         loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
 
-    # model = EEGGNN(cfg.model)
-    model = EEGGNN_Binary(cfg.model)
+    model = EEGGNN(cfg.model)
+    # model = EEGGNN_Binary(cfg.model)
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
