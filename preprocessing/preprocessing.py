@@ -2,6 +2,9 @@ import numpy as np
 from scipy import signal
 from preprocessing.utils import Preprocessing
 from preprocessing.preprocessing_github import GitHubFilter
+from typing import List
+from functools import reduce
+
 
 class FFTFilter(Preprocessing):
     def __init__(self, filter_order, low_freq, high_freq, fs):
@@ -24,3 +27,17 @@ PREPROCESSING_REGISTRY = {
     "identity": Identity,
     "github_filter": GitHubFilter
 }
+
+def compose_transforms(transforms):
+    def composed(x):
+        return reduce(lambda data, f: f(data), transforms, x)
+    return composed
+
+def instantiate_preprocessing(step):
+    cls = PREPROCESSING_REGISTRY[step["_target_"]]
+    step = {k: v for k, v in step.items() if k != "_target_"}
+    return cls(**step)
+
+def create_signal_transformer(steps: List):
+    transforms = [instantiate_preprocessing(step) for step in steps]
+    return compose_transforms(transforms)
