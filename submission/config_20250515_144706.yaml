@@ -31,9 +31,9 @@ dataset:
   distances_set: distances_3d.csv
 train:
   max_epochs: 1000
-  batch_size: 512
+  batch_size: 256
   seed: 42
-  prefetch_dataset: false
+  prefetch_dataset: true
   gradient_clip_val: 0.5
 early_stopping:
   monitor: val_loss
