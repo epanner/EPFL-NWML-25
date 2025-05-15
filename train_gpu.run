@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name train-ee-452-model-group-13 # Name for your job
+#SBATCH --time  500         # Runtime in minutes.
+#SBATCH --gres=gpu:1
+#SBATCH --mem=30G
+#SBATCH --partition gpu         # Partition to submit
+#SBATCH --account=ee-452
+#SBATCH --qos ee-452             # QOS
+#SBATCH --chdir /home/weidinge/EPFL-NWML-25
+#SBATCH --output=/home/weidinge/logs/%x.%j.out    # write stdout (and mixed stderr) here
+#SBATCH --error=/home/weidinge/logs/%x.%j.err     # write stderr here (optional)
+
+# ACTIVATE ANACONDA
+source /home/weidinge/miniconda3/etc/profile.d/conda.sh
+eval "$(conda shell.bash hook)"
+conda activate /home/weidinge/miniconda3/envs/nml_project/
+
+path=/home/ogut/data
+
+python main.py \
+dataset.data_path=$path \
+dataset.train_set=train \
+dataset.test_set=test \
+train.prefetch_dataset=True \
+train.batch_size=256 \
+train.comp_mode=True

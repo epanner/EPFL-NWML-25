@@ -1,5 +1,7 @@
 # Exclude data directory
 /data/
+/content/
+/wandb/
 
 # Python bytecode
 __pycache__/
@@ -19,6 +21,8 @@ env.bak/
 venv.bak/
 .python-version
 .conda/
+outputs/
+checkpoints/
 
 # Distribution / packaging
 dist/
