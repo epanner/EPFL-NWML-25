@@ -84,7 +84,7 @@ class EEGNet(nn.Module):
         return x
 
 class EEGTransformerNet(nn.Module):
-    def __init__(self, nb_classes, sequence_length, eeg_chans=22,
+    def __init__(self, num_classes, sequence_length, eeg_chans=19,
                  F1=16, D=2, eegnet_kernel_size=32, dropout_eegnet=0.3, dropout_positional_encoding=0.3, eegnet_pooling_1=5, eegnet_pooling_2=5, 
                  MSA_num_heads = 8, flag_positional_encoding=True, transformer_dim_feedforward=2048, num_transformer_layers=6):
         super(EEGTransformerNet, self).__init__()
@@ -98,8 +98,8 @@ class EEGTransformerNet(nn.Module):
 
         self.eegnet = EEGNet(eeg_chans=eeg_chans, F1=F1, eegnet_kernel_size=eegnet_kernel_size, D=D, 
                              eegnet_pooling_1=eegnet_pooling_1, eegnet_pooling_2=eegnet_pooling_2, dropout=dropout_eegnet)
-        self.linear = nn.Linear(self.sequence_length_transformer, nb_classes)
-         
+        self.linear = nn.Linear(self.sequence_length_transformer, num_classes)
+
         self.flag_positional_encoding = flag_positional_encoding
         self.pos_encoder = PositionalEncoding(self.sequence_length_transformer, dropout=dropout_positional_encoding)
         self.transformer_encoder_layer = nn.TransformerEncoderLayer(
@@ -151,27 +151,28 @@ class EEGTransformerNet(nn.Module):
         return x
 
 class EEGGNN(pl.LightningModule):
-    def __init__(self, cfg):
+    def __init__(self, cfg, do_not_create_model=False):
         super().__init__()
         self.save_hyperparameters()
         self.cfg = cfg
-        self.model = EEGTransformerNet(
-            nb_classes=2,
-            sequence_length=self.cfg.sequence_length,
-            eeg_chans=self.cfg.num_eeg_channels,
-            F1=self.cfg.F1,
-            D=self.cfg.D,
-            eegnet_kernel_size=self.cfg.eegnet_kernel_size,
-            # eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
-            eegnet_pooling_1=self.cfg.eegnet_pooling_1,
-            eegnet_pooling_2=self.cfg.eegnet_pooling_2,
-            dropout_eegnet=self.cfg.dropout_eegnet,
-            MSA_num_heads=self.cfg.MSA_num_heads,
-            transformer_dim_feedforward=self.cfg.transformer_dim_feedforward,
-            num_transformer_layers=self.cfg.num_transformer_layers,
-            flag_positional_encoding=self.cfg.flag_positional_encoding,
-        )
-        self.criterion = nn.CrossEntropyLoss()
+        if do_not_create_model:
+            self.model = EEGTransformerNet(
+                num_classes=2,
+                sequence_length=self.cfg.sequence_length,
+                eeg_chans=self.cfg.num_eeg_channels,
+                F1=self.cfg.F1,
+                D=self.cfg.D,
+                eegnet_kernel_size=self.cfg.eegnet_kernel_size,
+                # eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
+                eegnet_pooling_1=self.cfg.eegnet_pooling_1,
+                eegnet_pooling_2=self.cfg.eegnet_pooling_2,
+                dropout_eegnet=self.cfg.dropout_eegnet,
+                MSA_num_heads=self.cfg.MSA_num_heads,
+                transformer_dim_feedforward=self.cfg.transformer_dim_feedforward,
+                num_transformer_layers=self.cfg.num_transformer_layers,
+                flag_positional_encoding=self.cfg.flag_positional_encoding,
+            )
+            self.criterion = nn.CrossEntropyLoss()
         metrics = MetricCollection({
             'accuracy':  Accuracy(task="binary", average='none'),
             'accuracy_micro':  Accuracy(task="binary", average='micro'),
@@ -195,9 +196,9 @@ class EEGGNN(pl.LightningModule):
         # TODO this is not nice!
         x = x.float().to(self.device)
         logits = self(x)
-        loss = self.criterion(logits, y)
+        loss = self.loss_func(logits, y)
         self.log('train_loss', loss)
-        preds = logits.argmax(dim=1)
+        preds = self.prediction(logits)
         self.train_metrics.update(preds, y)
         return loss
     
@@ -211,9 +212,9 @@ class EEGGNN(pl.LightningModule):
         # TODO this is not nice!
         x = x.float().to(self.device)
         logits = self(x)
-        loss = self.criterion(logits, y)
+        loss = self.loss_func(logits, y)
         self.log('val_loss', loss, prog_bar=True)
-        preds = logits.argmax(dim=1)
+        preds = self.prediction(logits)
         self.val_metrics.update(preds, y)
 
     def on_validation_epoch_end(self):
@@ -226,9 +227,9 @@ class EEGGNN(pl.LightningModule):
         # TODO this is not nice!
         x = x.float().to(self.device)
         logits = self(x)
-        loss = self.criterion(logits, y)
+        loss = self.loss_func(logits, y)
         self.log('test_loss', loss)
-        preds = logits.argmax(dim=1)
+        preds = self.prediction(logits)
         self.test_metrics.update(preds, y)
 
     def on_test_epoch_end(self):
@@ -245,7 +246,56 @@ class EEGGNN(pl.LightningModule):
             gamma=self.cfg.scheduler.gamma
         )
         return {'optimizer': optimizer, 'lr_scheduler': scheduler}
+    
+    def prediction(self, logits: Tensor):
+        return logits.argmax(dim=1)
 
+    def loss_func(self, x: Tensor, y:Tensor):
+        return self.criterion(x, y)
+    
+    def __str__(self):
+        return type(self).__name__
+
+
+class EEGGNN_Binary(EEGGNN):
+    def __init__(self, cfg):
+        super().__init__(cfg, do_not_create_model=True)
+        self.save_hyperparameters()
+    
+        self.model = EEGTransformerNet(
+            num_classes=1,
+            sequence_length=cfg.sequence_length,
+            eeg_chans=cfg.num_eeg_channels,
+            F1=cfg.F1,
+            D=cfg.D,
+            eegnet_kernel_size=cfg.eegnet_kernel_size,
+            # eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
+            eegnet_pooling_1=cfg.eegnet_pooling_1,
+            eegnet_pooling_2=cfg.eegnet_pooling_2,
+            dropout_eegnet=cfg.dropout_eegnet,
+            MSA_num_heads=cfg.MSA_num_heads,
+            transformer_dim_feedforward=cfg.transformer_dim_feedforward,
+            num_transformer_layers=cfg.num_transformer_layers,
+            flag_positional_encoding=cfg.flag_positional_encoding,
+        )
+        self.criterion = nn.BCEWithLogitsLoss()
+
+    def forward(self, x):
+        logits = self.model(x)
+        return logits.squeeze(-1)
+    
+    def prediction(self, logits: Tensor):
+        # 1) get probabilities
+        probs = torch.sigmoid(logits)
+        # 2) make binary predictions
+        preds = (probs >= 0.5).long()
+        return preds
+    
+    def loss_func(self, x: Tensor, y:Tensor):
+        return self.criterion(x, y.float())
+    
+
+    
     # you can do this over a parameter when you create the trainer
     # def clip_gradients( self,
     #     optimizer,

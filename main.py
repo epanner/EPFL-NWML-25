@@ -4,7 +4,7 @@ import hydra
 import pandas as pd
 import torch
 # from model.gnn import EEGGNN
-from model.eeg_transformer import EEGGNN
+from model.eeg_transformer import EEGGNN, EEGGNN_Binary
 from preprocessing.preprocessing import create_signal_transformer
 from omegaconf import DictConfig
 from seiz_eeg.dataset import EEGDataset
@@ -54,11 +54,19 @@ def main(cfg: DictConfig):
                                                                                                                                                                                   
     wandb.init(project="eeg-gnn", config=dict(cfg))
     wandb_logger = WandbLogger(project="nml-project", config=dict(cfg))
+
     
+    loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True)#, num_workers=11)
+    if not cfg.train.comp_mode:
+        loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
+
+    # model = EEGGNN(cfg.model)
+    model = EEGGNN_Binary(cfg.model)
+
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath="checkpoints",
-        filename=f"best-checkpoint-{timestamp}",
+        filename=f"best-checkpoint-{model}-{timestamp}",
         verbose=True,
         monitor=cfg.checkpoint.monitor_comp_mode if cfg.train.comp_mode else cfg.checkpoint.monitor,
         save_top_k=cfg.checkpoint.save_top_k,
@@ -66,13 +74,6 @@ def main(cfg: DictConfig):
     )
     early_stop_cb = pl.callbacks.EarlyStopping(monitor=cfg.early_stopping.monitor_comp_mode if cfg.train.comp_mode else cfg.early_stopping.monitor,
                                                patience=cfg.early_stopping.patience)
-
-    
-    loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True)#, num_workers=11)
-    if not cfg.train.comp_mode:
-        loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
-
-    model = EEGGNN(cfg.model)
 
     trainer = pl.Trainer(
         max_epochs=cfg.train.max_epochs,
