@@ -31,9 +31,49 @@ class PositionalEncoding(nn.Module):
         x = x + self.pe[:x.size(0)]
         return self.dropout(x)
 
+
+class ECALayer(nn.Module):
+    """Efficient Channel Attention.
+
+    Args:
+        channels: Number of channels to apply attention over
+        gamma: Factor that determines kernel size based on channels
+        b: Offset for kernel size calculation
+    """
+
+    def __init__(self, channels, gamma=2, b=1):
+        super(ECALayer, self).__init__()
+        t = int(abs(math.log(channels, 2) + b) / gamma) # Increases kernel size adaptively with more channels
+        k = t if t % 2 else t + 1 # Ensures kernel size is always odd (clear center)
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.conv = nn.Conv1d(1, 1, kernel_size=k, padding=(k - 1) // 2, bias=False)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # x: input features with shape [batch, channels, height, width]
+        b, c, h, w = x.size()
+
+        # Feature descriptor on the global spatial information
+        y = self.avg_pool(x)
+
+        # Reshape to [batch, 1, channels]
+        y = y.reshape(b, 1, c)
+
+        # Two-layer 1D conv for capturing cross-channel interactions
+        y = self.conv(y)
+
+        # Reshape to [batch, channels, 1, 1]
+        y = y.reshape(b, c, 1, 1)
+
+        # Sigmoid activation for attention weights
+        y = self.sigmoid(y)
+
+        # Channel-wise multiplication
+        return x * y
+
 class EEGNet(nn.Module):
     def __init__(self, F1=16, eegnet_kernel_size=32, D=2, eeg_chans=22, eegnet_separable_kernel_size=16,
-                 eegnet_pooling_1=8, eegnet_pooling_2=4, dropout=0.5):
+                 eegnet_pooling_1=8, eegnet_pooling_2=4, dropout=0.5, use_eca=False):
         super(EEGNet, self).__init__()
 
         F2 = F1*D
@@ -48,6 +88,11 @@ class EEGNet(nn.Module):
         self.block3 = nn.Conv2d(F2, F2, (1, eegnet_separable_kernel_size), padding='same', bias=False)
         self.bn3 = nn.BatchNorm2d(F2)
         self.avg_pool2 = nn.AvgPool2d((1, eegnet_pooling_2))
+        self.use_eca = use_eca
+
+        # Optional ECA layer
+        if self.use_eca:
+            self.eca = ECALayer(F2)
 
     def forward(self, x):
         # x.shape = (B, 1, C, L)
@@ -81,12 +126,17 @@ class EEGNet(nn.Module):
         # x.shape = (B, F1*D, 1, L/64)
         if debug_mode_flag: print('Shape of x by the end of EEGNet: ', x.shape)
 
+        # Apply ECA if enabled
+        if self.use_eca:
+            x = self.eca(x)
+            if debug_mode_flag: print('Shape of x after ECA: ', x.shape)
+
         return x
 
 class EEGTransformerNet(nn.Module):
     def __init__(self, nb_classes, sequence_length, eeg_chans=22,
                  F1=16, D=2, eegnet_kernel_size=32, dropout_eegnet=0.3, dropout_positional_encoding=0.3, eegnet_pooling_1=5, eegnet_pooling_2=5, 
-                 MSA_num_heads = 8, flag_positional_encoding=True, transformer_dim_feedforward=2048, num_transformer_layers=6):
+                 MSA_num_heads = 8, flag_positional_encoding=True, transformer_dim_feedforward=2048, num_transformer_layers=6, use_eca=False):
         super(EEGTransformerNet, self).__init__()
         """
         F1 = the number of temporal filters
@@ -97,7 +147,7 @@ class EEGTransformerNet(nn.Module):
         self.sequence_length_transformer = sequence_length//eegnet_pooling_1//eegnet_pooling_2
 
         self.eegnet = EEGNet(eeg_chans=eeg_chans, F1=F1, eegnet_kernel_size=eegnet_kernel_size, D=D, 
-                             eegnet_pooling_1=eegnet_pooling_1, eegnet_pooling_2=eegnet_pooling_2, dropout=dropout_eegnet)
+                             eegnet_pooling_1=eegnet_pooling_1, eegnet_pooling_2=eegnet_pooling_2, dropout=dropout_eegnet,use_eca=use_eca)
         self.linear = nn.Linear(self.sequence_length_transformer, nb_classes)
          
         self.flag_positional_encoding = flag_positional_encoding
@@ -170,6 +220,7 @@ class EEGGNN(pl.LightningModule):
             transformer_dim_feedforward=self.cfg.transformer_dim_feedforward,
             num_transformer_layers=self.cfg.num_transformer_layers,
             flag_positional_encoding=self.cfg.flag_positional_encoding,
+            use_eca=self.cfg.use_eca,
         )
         self.criterion = nn.CrossEntropyLoss()
         metrics = MetricCollection({
