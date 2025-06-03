@@ -151,11 +151,11 @@ class EEGTransformerNet(nn.Module):
         return x
 
 class EEGGNN(pl.LightningModule):
-    def __init__(self, cfg, do_not_create_model=False):
+    def __init__(self, cfg, create_model=True):
         super().__init__()
         self.save_hyperparameters()
         self.cfg = cfg
-        if do_not_create_model:
+        if create_model:
             self.model = EEGTransformerNet(
                 num_classes=2,
                 sequence_length=self.cfg.sequence_length,
@@ -258,26 +258,26 @@ class EEGGNN(pl.LightningModule):
 
 
 class EEGGNN_Binary(EEGGNN):
-    def __init__(self, cfg):
-        super().__init__(cfg, do_not_create_model=True)
+    def __init__(self, cfg, create_model=True):
+        super().__init__(cfg, create_model=False)
         self.save_hyperparameters()
-    
-        self.model = EEGTransformerNet(
-            num_classes=1,
-            sequence_length=cfg.sequence_length,
-            eeg_chans=cfg.num_eeg_channels,
-            F1=cfg.F1,
-            D=cfg.D,
-            eegnet_kernel_size=cfg.eegnet_kernel_size,
-            # eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
-            eegnet_pooling_1=cfg.eegnet_pooling_1,
-            eegnet_pooling_2=cfg.eegnet_pooling_2,
-            dropout_eegnet=cfg.dropout_eegnet,
-            MSA_num_heads=cfg.MSA_num_heads,
-            transformer_dim_feedforward=cfg.transformer_dim_feedforward,
-            num_transformer_layers=cfg.num_transformer_layers,
-            flag_positional_encoding=cfg.flag_positional_encoding,
-        )
+        if create_model:
+            self.model = EEGTransformerNet(
+                num_classes=1,
+                sequence_length=cfg.sequence_length,
+                eeg_chans=cfg.num_eeg_channels,
+                F1=cfg.F1,
+                D=cfg.D,
+                eegnet_kernel_size=cfg.eegnet_kernel_size,
+                # eegnet_separable_kernel_size=self.cfg.eegnet_separable_kernel_size,
+                eegnet_pooling_1=cfg.eegnet_pooling_1,
+                eegnet_pooling_2=cfg.eegnet_pooling_2,
+                dropout_eegnet=cfg.dropout_eegnet,
+                MSA_num_heads=cfg.MSA_num_heads,
+                transformer_dim_feedforward=cfg.transformer_dim_feedforward,
+                num_transformer_layers=cfg.num_transformer_layers,
+                flag_positional_encoding=cfg.flag_positional_encoding,
+            )
         self.criterion = nn.BCEWithLogitsLoss()
 
     def forward(self, x):
@@ -294,55 +294,3 @@ class EEGGNN_Binary(EEGGNN):
     def loss_func(self, x: Tensor, y:Tensor):
         return self.criterion(x, y.float())
     
-
-    
-    # you can do this over a parameter when you create the trainer
-    # def clip_gradients( self,
-    #     optimizer,
-    #     gradient_clip_val,
-    #     gradient_clip_algorithm):
-    #     # Clip gradients for the main model parameters
-    #     torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.5)
-
-
-# def define_initial_hyperparameters(eegnet_F1=32, eegnet_D=2, eegnet_kernel_size=32, MSA_num_heads=4):
-
-#     ### model hyperparameters
-#     # eegnet_F1, eegnet_D = 64, 2
-#     # eegnet_kernel_size = 64
-#     MSA_embed_dim = eegnet_F1*eegnet_D + 0
-#     # MSA_num_heads = 8
-
-#     dropout = 0.3  # dropout probability
-
-#     model = EEGTransformerNet(nb_classes = nclasses, eeg_chans=num_eeg_channels, sequence_length=sequence_length,
-#                     F1=eegnet_F1, D=eegnet_D, eegnet_kernel_size=eegnet_kernel_size, 
-#                     MSA_embed_dim = MSA_embed_dim, MSA_num_heads = MSA_num_heads, dropout_eegnet=dropout).to(device)
-
-#     model_stats = summary(model, input_size=(batch_size, num_eeg_channels, sequence_length), verbose=0)
-#     print(model_stats)
-
-#     # Define a DataLoader
-#     # DataLoader combines a dataset and a sampler, and provides an iterable over the given dataset. It also provides multi-process data loading with the num_workers argument.
-    
-#     train_dir = os.path.join(data_root, 'train')  # Specify the path to your root directory
-#     train_dataset = NumpyDataset(train_dir)
-#     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-
-#     val_dir = os.path.join(data_root, 'val')  # Specify the path to your root directory
-#     val_dataset = NumpyDataset(val_dir)
-#     val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-
-#     test_dir = os.path.join(data_root, 'test')  # Specify the path to your root directory
-#     test_dataset = NumpyDataset(test_dir)
-#     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-
-#     lr = 0.0001  # learning rate
-#     # optimizer = torch.optim.SGD(model.parameters(), lr=lr)
-#     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-#     STEPLR_period = 10.0
-#     STEPLR_gamma = 0.1
-#     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, STEPLR_period, gamma=STEPLR_gamma)
-
-#     # best_val_loss = float('inf')
-#     epochs = 1000

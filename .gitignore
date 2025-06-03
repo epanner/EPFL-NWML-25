@@ -23,7 +23,7 @@ venv.bak/
 .conda/
 outputs/
 checkpoints/
-
+multirun_logs/
 # Distribution / packaging
 dist/
 build/

@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from omegaconf import OmegaConf
 from omegaconf import DictConfig
 import lightning.pytorch as pl
-from model.eeg_transformer import EEGGNN
+from model.eeg_transformer import EEGGNN, EEGGNN_Binary
 from tqdm import tqdm
 
 def generate_submission(cfg, model, transform_fn=None, fix_underscores=False):
@@ -65,17 +65,17 @@ def generate_submission(cfg, model, transform_fn=None, fix_underscores=False):
     submission_df.to_csv(f"submission/submission_seed_{now}.csv", index=False)
     OmegaConf.save(cfg, f"submission/config_{now}.yaml")
 
-@hydra.main(config_path="config", config_name="config", version_base="1.1")
+@hydra.main(config_path="config", config_name="eeg_transformer_run", version_base="1.1")
 def main(cfg: DictConfig):
     pl.seed_everything(cfg.train.seed)
     print(cfg.checkpoint_path)
-    model = EEGGNN.load_from_checkpoint(cfg.checkpoint_path)
+    model = EEGGNN_Binary.load_from_checkpoint(cfg.checkpoint_path)
     generate_submission(cfg, model, fix_underscores=True)
 
 # run like
 # python submission.py \
 # +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-2025-05-14_18-56-10.ckpt
-
+# python submission.py +checkpoint_path=
 
 # If you want to use different config
 # --config-path /new/path/to/conf \

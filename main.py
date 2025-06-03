@@ -4,7 +4,6 @@ import hydra
 import pandas as pd
 import torch
 # from model.gnn import EEGGNN
-from model.eeg_transformer import EEGGNN, EEGGNN_Binary
 from preprocessing.preprocessing import create_signal_transformer
 from omegaconf import DictConfig
 from seiz_eeg.dataset import EEGDataset
@@ -14,6 +13,7 @@ import lightning.pytorch as pl
 from lightning.pytorch.loggers import WandbLogger
 from torch.utils.data import DataLoader
 from submission import generate_submission
+from model.model import MODEL_REGISTRY
 
 def flatten_dict(d: dict, parent_key: str = "", sep: str = ".") -> dict:
     items: dict = {}
@@ -35,8 +35,6 @@ def main(cfg: DictConfig):
     DATA_ROOT = Path(cfg.dataset.data_path)
     clips_tr = pd.read_parquet(DATA_ROOT / cfg.dataset.train_set / "segments.parquet")
 
-    # TODO Wie weit muss man ins Fenster davor und danach schauen gerade auch fürs Kurven glätten relevant oder?
-    # Oder schaut keiner in mehrere Fenster?!
     if not cfg.train.comp_mode:
         clips_tr, clips_val = train_test_split(
             clips_tr,
@@ -76,7 +74,7 @@ def main(cfg: DictConfig):
         loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
 
     # model = EEGGNN(cfg.model)
-    model = EEGGNN_Binary(cfg.model)
+    model = MODEL_REGISTRY[cfg.model["_target_"]](cfg.model)
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     checkpoint_callback = pl.callbacks.ModelCheckpoint(

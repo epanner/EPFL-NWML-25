@@ -1,4 +1,5 @@
 # Model architecture parameters
+_target_: "EEGTransformer"
 F1: 128                             # number of temporal filters
 D: 2                                # spatial filter multiplier
 eegnet_kernel_size: 32              # do they depend on F1 size?             # temporal convolution kernel length

@@ -1,6 +1,6 @@
 defaults:
   - preprocessing: github_filter
-  - model: eeg_net
+  - model: eeg_transformer
   - _self_
 
 dataset:
@@ -8,12 +8,7 @@ dataset:
   train_set: "train/train"
   test_set: "test/test"
   distances_set: "distances_3d.csv"
-  # segment_interval: 4                 # seconds per segment
-  # resample_fs: 250                    # sampling rate used elsewhere
-  # sequence_length: 1000               # segment_interval * resample_fs
-
-# TODO was ist das resample fs und das mit dem Segment kann sein das ich das falsch mache?
-
+  
 # Training settings
 train:
   max_epochs: 1000
