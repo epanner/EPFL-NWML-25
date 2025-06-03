@@ -15,6 +15,17 @@ from lightning.pytorch.loggers import WandbLogger
 from torch.utils.data import DataLoader
 from submission import generate_submission
 
+def flatten_dict(d: dict, parent_key: str = "", sep: str = ".") -> dict:
+    items: dict = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.update(flatten_dict(v, new_key, sep=sep))
+        else:
+            items[new_key] = v
+    return items
+
+
 @hydra.main(config_path="config", config_name="config", version_base="1.1")
 def main(cfg: DictConfig):
     pl.seed_everything(cfg.train.seed)
@@ -51,8 +62,12 @@ def main(cfg: DictConfig):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")                                                                                                                              
-                                                                                                                                                                                  
-    wandb.init(project="eeg-gnn", config=dict(cfg))
+
+    run_name = f"kernel_size_{cfg.model.eegnet_kernel_size}_f1_{cfg.model.F1}"                                                                                                                                                              
+    wandb.init(project="eeg-gnn",
+               config=flatten_dict(cfg),
+               name=run_name, 
+               reinit=True)
     wandb_logger = WandbLogger(project="nml-project", config=dict(cfg))
 
     

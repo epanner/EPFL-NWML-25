@@ -1,0 +1,25 @@
+/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/torch/nn/modules/transformer.py:382: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/loggers/wandb.py:397: There is a wandb run already in progress and newly created instances of `WandbLogger` will reuse this run. If this is not desired, call `wandb.finish()` before instantiating `WandbLogger`.
+
+  | Name          | Type              | Params | Mode
+------------------------------------------------------------
+0 | model         | EEGTransformerNet | 3.0 M  | train
+1 | criterion     | BCEWithLogitsLoss | 0      | train
+2 | train_metrics | MetricCollection  | 0      | train
+3 | val_metrics   | MetricCollection  | 0      | train
+4 | test_metrics  | MetricCollection  | 0      | train
+------------------------------------------------------------
+3.0 M     Trainable params
+0         Non-trainable params
+3.0 M     Total params
+12.139    Total estimated model params size (MB)
+115       Modules in train mode
+0         Modules in eval mode
+Sanity Checking: |                                                                                                                                                                           | 0/? [00:00<?, ?it/s]
+/home/veit/miniconda3/envs/nml_project/lib/python3.11/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=11` in the `DataLoader` to improve performance.
+
+Detected KeyboardInterrupt, attempting graceful shutdown ...

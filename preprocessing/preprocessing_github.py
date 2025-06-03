@@ -21,7 +21,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=3):
 class GitHubFilter(Preprocessing):
     def __init__(self,
                  lowcut: float = 0.5,
-                 highcut: float = 50.0, #instead of 120
+                 highcut: float = 120.0, 
                  fs: int = 1024,
                  resampleFS: int = 250):
         """

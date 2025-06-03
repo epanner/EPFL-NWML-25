@@ -1,0 +1,2 @@
+- model.eegnet_kernel_size=32
+- model.F1=32

@@ -1,6 +1,6 @@
 steps:
   - _target_: github_filter
     lowcut: 0.5
-    highcut: 120.0
-    fs: 1024
+    highcut: 50 #instead of 120.0
+    fs: 250 #instead of 250
     resampleFS: 250

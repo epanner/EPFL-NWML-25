@@ -1,0 +1,15 @@
+{"time":"2025-06-03T12:34:04.287811357+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.10","symlink path":"/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/multirun_logs/model.F1=32,model.eegnet_kernel_size=32/0/wandb/run-20250603_123404-giamdjui/logs/debug-core.log"}
+{"time":"2025-06-03T12:34:04.681458452+02:00","level":"INFO","msg":"created new stream","id":"giamdjui"}
+{"time":"2025-06-03T12:34:04.68152239+02:00","level":"INFO","msg":"stream: started","id":"giamdjui"}
+{"time":"2025-06-03T12:34:04.681618357+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"giamdjui"}
+{"time":"2025-06-03T12:34:04.681635585+02:00","level":"INFO","msg":"handler: started","stream_id":"giamdjui"}
+{"time":"2025-06-03T12:34:04.681705508+02:00","level":"INFO","msg":"sender: started","stream_id":"giamdjui"}
+{"time":"2025-06-03T12:34:05.096508974+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-03T12:34:08.412574002+02:00","level":"INFO","msg":"stream: closing","id":"giamdjui"}
+{"time":"2025-06-03T12:34:08.412652571+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-03T12:34:08.412733614+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-03T12:34:09.287235467+02:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-03T12:34:09.596812596+02:00","level":"INFO","msg":"handler: closed","stream_id":"giamdjui"}
+{"time":"2025-06-03T12:34:09.59692149+02:00","level":"INFO","msg":"sender: closed","stream_id":"giamdjui"}
+{"time":"2025-06-03T12:34:09.596901041+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"giamdjui"}
+{"time":"2025-06-03T12:34:09.59704162+02:00","level":"INFO","msg":"stream: closed","id":"giamdjui"}
