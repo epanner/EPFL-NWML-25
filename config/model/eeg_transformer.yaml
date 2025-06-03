@@ -2,7 +2,7 @@
 _target_: "EEGTransformer"
 F1: 128                             # number of temporal filters
 D: 2                                # spatial filter multiplier
-eegnet_kernel_size: 32              # do they depend on F1 size?             # temporal convolution kernel length
+eegnet_kernel_size: 64              # do they depend on F1 size?             # temporal convolution kernel length
 eegnet_separable_kernel_size: 16    # separable convolution kernel length
 eegnet_pooling_1: 8                 # first pooling window
 eegnet_pooling_2: 4                 # second pooling window

@@ -193,7 +193,6 @@ class EEGGNN(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        # TODO this is not nice!
         x = x.float().to(self.device)
         logits = self(x)
         loss = self.loss_func(logits, y)
@@ -209,7 +208,6 @@ class EEGGNN(pl.LightningModule):
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        # TODO this is not nice!
         x = x.float().to(self.device)
         logits = self(x)
         loss = self.loss_func(logits, y)
@@ -224,7 +222,6 @@ class EEGGNN(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        # TODO this is not nice!
         x = x.float().to(self.device)
         logits = self(x)
         loss = self.loss_func(logits, y)
