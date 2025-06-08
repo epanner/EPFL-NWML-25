@@ -150,7 +150,7 @@ class EEGTransformerNet(nn.Module):
         x = self.linear(x)
         return x
 
-class EEGGNN(pl.LightningModule):
+class EEGTranformer(pl.LightningModule):
     def __init__(self, cfg, create_model=True):
         super().__init__()
         self.save_hyperparameters()
@@ -193,7 +193,8 @@ class EEGGNN(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        x = x.float().to(self.device)
+        x = x.to(self.device)
+        # x = x.float().to(self.device)
         logits = self(x)
         loss = self.loss_func(logits, y)
         self.log('train_loss', loss)
@@ -254,7 +255,7 @@ class EEGGNN(pl.LightningModule):
         return type(self).__name__
 
 
-class EEGGNN_Binary(EEGGNN):
+class EEGTranformer_Binary(EEGTranformer):
     def __init__(self, cfg, create_model=True):
         super().__init__(cfg, create_model=False)
         self.save_hyperparameters()

@@ -60,8 +60,8 @@ def main(cfg: DictConfig):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")                                                                                                                              
-
-    run_name = f"kernel_size_{cfg.model.eegnet_kernel_size}_f1_{cfg.model.F1}"                                                                                                                                                              
+    run_name = f"test_gnn"
+    # run_name = f"kernel_size_{cfg.model.eegnet_kernel_size}_f1_{cfg.model.F1}"                                                                                                                                                              
     wandb.init(project="eeg-gnn",
                config=flatten_dict(cfg),
                name=run_name, 

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import math
 from torch_geometric.nn import GATConv
 import pandas as pd
-from model.eeg_transformer import EEGGNN_Binary
+from model.eeg_transformer import EEGTranformer_Binary
 debug_mode_flag = False
 
 
@@ -329,7 +329,7 @@ class EEGNetGNN(nn.Module):
         return x
 
 
-class EEG_GAT(EEGGNN_Binary):
+class EEG_GAT(EEGTranformer_Binary):
     def __init__(self, cfg):
         super().__init__(cfg, create_model=False)
         self.save_hyperparameters()

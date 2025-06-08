@@ -1,7 +1,6 @@
 steps:
-  - _target_: fft_filter
-    filter_order: 4
-    low_freq: 0.5
-    high_freq: 30
-    fs: 250
-  - _target_: identity
+  - _target_: github_filter
+    lowcut: 0.5
+    highcut: 50 #instead of 120.0
+    fs: 250 #instead of 250
+    resampleFS: 250

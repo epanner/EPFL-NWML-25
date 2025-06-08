@@ -14,5 +14,7 @@ torchvision
 torch-geometric
 torchmetrics
 
+sentence_transformers
+
 hydra-core
 wandb

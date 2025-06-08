@@ -2,7 +2,7 @@ import numpy as np
 from scipy.signal import iirnotch, lfilter, butter, filtfilt
 from preprocessing.utils import Preprocessing
 from preprocessing.utils import make_a_filtered_plot_for_comparison, plot_signal_in_frequency
-
+from scipy.fftpack import fft
 
 def butter_bandpass(lowcut, highcut, fs, order=3):
     nyq = 0.5 * fs
@@ -76,4 +76,68 @@ class GitHubFilter(Preprocessing):
         # make_a_filtered_plot_for_comparison(signals, filtered, self.resampleFS)
         # plot_signal_in_frequency(signals[0], filtered[0], self.resampleFS)
         return filtered
+# From https://github.com/USC-InfoLab/NeuroGNN/blob/main/data/data_utils.py#L13
+def computeFFT(signals, n):
+    fourier_signal = fft(signals, n=n, axis=-1)
+    idx_pos = int(np.floor(n / 2))
+    fourier_signal = fourier_signal[:, :idx_pos]
+    amp = np.abs(fourier_signal)
+    amp[amp == 0.0] = 1e-8
+    return np.log(amp)
+
+class NeuroGNNFilter(Preprocessing):
+    def __init__(self,
+                 fs: int = 250,
+                 resampleFS: int = 250,
+                 time_step_size: int = 1,
+                 clip_len: int = 12,
+                 ):
+        """
+        Initialize YourClass.
+
+        Parameters
+        ----------
+        lowcut : float
+            Lower cutoff frequency for bandpass filter (Hz).
+        highcut : float
+            Upper cutoff frequency for bandpass filter (Hz).
+        fs : int
+            Sampling frequency for original signal (Hz).
+        resampleFS : int
+            Target sampling frequency when resampling (Hz).
+        """
+        self.fs = fs
+        self.resampleFS = resampleFS
+        assert self.fs == self.resampleFS
+        # new
+        self.clip_len = clip_len
+        self.time_step_size = time_step_size
+
+        self.physical_clip_len = int(self.fs * clip_len)
+        self.physical_time_step_size = int(self.fs * time_step_size)
+
+    def __call__(self, signals: np.ndarray) -> np.ndarray:
+        # First transpose to match original format (channels, time)
+        signals = signals.T  # Now shape is (n_samples, n_windows)
+        
+        # Create time windows as in original
+        time_steps = []
+        start_time_step = 0
+        while start_time_step <= signals.shape[1] - self.physical_time_step_size:
+            end_time_step = start_time_step + self.physical_time_step_size
+            curr_time_step = signals[:, start_time_step:end_time_step]
+            FT = computeFFT(curr_time_step, self.physical_time_step_size)
+            time_steps.append(FT)
+            start_time_step = end_time_step
+        
+        # Stack and transpose back to original format
+        filtered = np.stack(time_steps, axis=0)
+        # filtered_turn = filtered.T
+        
+        # make_a_filtered_plot_for_comparison(signals, filtered, self.resampleFS)
+        # plot_signal_in_frequency(signals[0], filtered[0], self.resampleFS)
+        
+        return filtered
+
+
 

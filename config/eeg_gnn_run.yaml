@@ -1,5 +1,6 @@
 defaults:
-  - preprocessing: github_filter
+  - preprocessing: fft_gnn
+  # - preprocessing: github_filter
   - model: eeg_gnn
   - _self_
 
@@ -11,7 +12,7 @@ dataset:
 
 # Training settings
 train:
-  max_epochs: 1000
+  max_epochs: 100
   batch_size: 512 #Original 1048
   seed: 42
   prefetch_dataset: False # If you have enough ram you can switch to true
