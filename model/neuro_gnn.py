@@ -266,6 +266,7 @@ class NeuroGNN_GraphConstructor(nn.Module):
                 m.out_proj.bias.data.zero_()  
 
         self.to(device) 
+        self.device = device
 
 
     # def latent_correlation_layer(self, x):
@@ -380,7 +381,7 @@ class NeuroGNN_GraphConstructor(nn.Module):
         X = weighted_res.permute(0, 1, 2).contiguous()
         X = self.layer_norm3(X)
         if self.semantic_embs is not None:
-            init_sem_embs = self.semantic_embs.to(x.get_device())
+            init_sem_embs = self.semantic_embs.to(self.device)
             transformed_embeds = self.linear_semantic_embs(init_sem_embs)
             # transformed_embeds = self.semantic_embs_layer_norm(transformed_embeds + init_sem_embs)
             # transformed_embeds = self.semantic_embs.to(x.get_device())
@@ -389,7 +390,7 @@ class NeuroGNN_GraphConstructor(nn.Module):
             X = torch.cat((X, transformed_embeds), dim=2)
             
         embed_att = self.get_embed_att_mat_cosine(transformed_embeds)
-        self.dist_adj = self.dist_adj.to(x.get_device())
+        self.dist_adj = self.dist_adj.to(self.device)
         attention = ((self.att_alpha*self.dist_adj) + (1-self.att_alpha)*embed_att) * attention
         adj_mat_unthresholded = attention.detach().clone()
         
@@ -512,7 +513,8 @@ class NeuroGNN_Classification(nn.Module):
                                         dist_adj=dist_adj,
                                         semantic_embs=initial_sem_embeds,
                                         gnn_block_type=self.gnn_type,
-                                        meta_node_indices=self.meta_node_indices
+                                        meta_node_indices=self.meta_node_indices,
+                                        device=device,
                                         )
 
         self.fc = nn.Linear(self.encoder.conv_hidden_dim, num_classes)
@@ -673,6 +675,7 @@ class NeuroGNN(EEGTranformer):
             distances_df = pd.read_csv(csv_path)
             dist_adj, _, _ = get_extended_adjacency_matrix(distances_df, INCLUDED_CHANNELS, ELECTRODES_REGIONS)
             initial_sem_embs = get_semantic_embeds()
+            # initial_sem_embs = initial_sem_embs[:19] # TODO Workaround to cut the regions
             
             self.model = NeuroGNN_Classification(cfg, 1, self.device, dist_adj, initial_sem_embs, meta_node_indices=META_NODE_INDICES)
         

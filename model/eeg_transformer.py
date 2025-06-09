@@ -1,3 +1,4 @@
+# Code from https://github.com/UnitedHolmes/seizure_detection_EEGs_transformer_BHI_2023/tree/main
 import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
@@ -193,8 +194,7 @@ class EEGTranformer(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        x = x.to(self.device)
-        # x = x.float().to(self.device)
+        x = x.float().to(self.device)
         logits = self(x)
         loss = self.loss_func(logits, y)
         self.log('train_loss', loss)

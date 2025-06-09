@@ -22,7 +22,7 @@ INCLUDED_CHANNELS = [
     'EEG PZ']
 
 # Resampling frequency
-FREQUENCY = 200
+FREQUENCY = 250
 
 # All seizure labels available in TUH
 ALL_LABEL_DICT = {'fnsz': 0, 'gnsz': 1, 'spsz': 2, 'cpsz': 3,

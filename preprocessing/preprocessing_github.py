@@ -3,6 +3,7 @@ from scipy.signal import iirnotch, lfilter, butter, filtfilt
 from preprocessing.utils import Preprocessing
 from preprocessing.utils import make_a_filtered_plot_for_comparison, plot_signal_in_frequency
 from scipy.fftpack import fft
+from model.neuro_constants import META_NODE_INDICES
 
 def butter_bandpass(lowcut, highcut, fs, order=3):
     nyq = 0.5 * fs
@@ -79,11 +80,36 @@ class GitHubFilter(Preprocessing):
 # From https://github.com/USC-InfoLab/NeuroGNN/blob/main/data/data_utils.py#L13
 def computeFFT(signals, n):
     fourier_signal = fft(signals, n=n, axis=-1)
+    
+    # cut away symetric negative frequencys
     idx_pos = int(np.floor(n / 2))
     fourier_signal = fourier_signal[:, :idx_pos]
+
     amp = np.abs(fourier_signal)
     amp[amp == 0.0] = 1e-8
     return np.log(amp)
+
+def augment_data(x, meta_node_indices):
+    """
+    Args:
+        x: (max_seq_len, num_nodes, input_dim)
+        meta_node_indices: list of indices of meta nodes
+    Returns:
+        x: (max_seq_len, num_nodes + len(meta_node_indices), input_dim)
+    """
+    # for index_list in meta_node_indices:
+    #     node_series_list = x[:, index_list, :]  # Extract the series for the current node from x
+    #     meta_series = node_series_list.mean(axis=1, keepdims=True)  # Take the mean of the series
+    #     x = torch.cat([x, meta_series], axis=1)
+    # return x
+    """
+    x : (max_seq_len, num_nodes, input_dim)  NumPy array
+    returns : (max_seq_len, num_nodes + len(meta_node_indices), input_dim)
+    """
+    for index_list in meta_node_indices:
+        meta_series = x[:, index_list, :].mean(axis=1, keepdims=True)   # axis=1 → electrodes :contentReference[oaicite:3]{index=3}
+        x = np.concatenate([x, meta_series], axis=1)                    # append along node-axis
+    return x
 
 class NeuroGNNFilter(Preprocessing):
     def __init__(self,
@@ -132,6 +158,9 @@ class NeuroGNNFilter(Preprocessing):
         
         # Stack and transpose back to original format
         filtered = np.stack(time_steps, axis=0)
+
+        filtered = augment_data(filtered, META_NODE_INDICES)
+
         # filtered_turn = filtered.T
         
         # make_a_filtered_plot_for_comparison(signals, filtered, self.resampleFS)
