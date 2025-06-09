@@ -1,25 +1,25 @@
 # Copied from https://github.com/USC-InfoLab/NeuroGNN/blob/main/constants.pys
 # Channels of interest
 INCLUDED_CHANNELS = [
-    'EEG FP1',
-    'EEG FP2',
-    'EEG F3',
-    'EEG F4',
-    'EEG C3',
-    'EEG C4',
-    'EEG P3',
-    'EEG P4',
-    'EEG O1',
-    'EEG O2',
-    'EEG F7',
-    'EEG F8',
-    'EEG T3',
-    'EEG T4',
-    'EEG T5',
-    'EEG T6',
-    'EEG FZ',
-    'EEG CZ',
-    'EEG PZ']
+    'FP1',
+    'FP2',
+    'F3',
+    'F4',
+    'C3',
+    'C4',
+    'P3',
+    'P4',
+    'O1',
+    'O2',
+    'F7',
+    'F8',
+    'T3',
+    'T4',
+    'T5',
+    'T6',
+    'FZ',
+    'CZ',
+    'PZ']
 
 # Resampling frequency
 FREQUENCY = 250
@@ -43,25 +43,25 @@ CORTEX_REGIONS = [
 
 
 ELECTRODES_BROADMANN_MAPPING = {
-    'EEG FP1': 'BA10 Left',
-    'EEG FP2': 'BA10 Right',
-    'EEG F3': 'BA9 Left',
-    'EEG F4': 'BA9 Right',
-    'EEG C3': 'BA1 Left',
-    'EEG C4': 'BA1 Right',
-    'EEG P3': 'BA39 Left',
-    'EEG P4': 'BA39 Right',
-    'EEG O1': 'BA18 Left',
-    'EEG O2': 'BA18 Right',
-    'EEG F7': 'BA45 Left',
-    'EEG F8': 'BA45 Right',
-    'EEG T3': 'BA42/22 Left',
-    'EEG T4': 'BA42/22 Right',
-    'EEG T5': 'BA19 Left',
-    'EEG T6': 'BA19 Right',
-    'EEG FZ': 'BA6 Left',
-    'EEG CZ': 'BA4 Right',
-    'EEG PZ': 'BA7 Left'
+    'FP1': 'BA10 Left',
+    'FP2': 'BA10 Right',
+    'F3': 'BA9 Left',
+    'F4': 'BA9 Right',
+    'C3': 'BA1 Left',
+    'C4': 'BA1 Right',
+    'P3': 'BA39 Left',
+    'P4': 'BA39 Right',
+    'O1': 'BA18 Left',
+    'O2': 'BA18 Right',
+    'F7': 'BA45 Left',
+    'F8': 'BA45 Right',
+    'T3': 'BA42/22 Left',
+    'T4': 'BA42/22 Right',
+    'T5': 'BA19 Left',
+    'T6': 'BA19 Right',
+    'FZ': 'BA6 Left',
+    'CZ': 'BA4 Right',
+    'PZ': 'BA7 Left'
 }
 
 
@@ -117,25 +117,25 @@ CORTEX_REGIONS_DESCRIPTIONS = {
 
 
 ELECTRODES_REGIONS = {
-    'EEG FP1': 'Pre-Frontal Lobe',
-    'EEG FP2': 'Pre-Frontal Lobe',
-    'EEG F3': 'Frontal Lobe',
-    'EEG F4': 'Frontal Lobe',
-    'EEG C3': 'Central Gyrus',
-    'EEG C4': 'Central Gyrus',
-    'EEG P3': 'Parietal Lobe',
-    'EEG P4': 'Parietal Lobe',
-    'EEG O1': 'Occipital Lobe',
-    'EEG O2': 'Occipital Lobe',
-    'EEG F7': 'Frontal Lobe',
-    'EEG F8': 'Frontal Lobe',
-    'EEG T3': 'Temporal Lobe',
-    'EEG T4': 'Temporal Lobe',
-    'EEG T5': 'Temporal Lobe',
-    'EEG T6': 'Temporal Lobe',
-    'EEG FZ': 'Frontal Lobe',
-    'EEG CZ': 'Central Gyrus',
-    'EEG PZ': 'Parietal Lobe'
+    'FP1': 'Pre-Frontal Lobe',
+    'FP2': 'Pre-Frontal Lobe',
+    'F3': 'Frontal Lobe',
+    'F4': 'Frontal Lobe',
+    'C3': 'Central Gyrus',
+    'C4': 'Central Gyrus',
+    'P3': 'Parietal Lobe',
+    'P4': 'Parietal Lobe',
+    'O1': 'Occipital Lobe',
+    'O2': 'Occipital Lobe',
+    'F7': 'Frontal Lobe',
+    'F8': 'Frontal Lobe',
+    'T3': 'Temporal Lobe',
+    'T4': 'Temporal Lobe',
+    'T5': 'Temporal Lobe',
+    'T6': 'Temporal Lobe',
+    'FZ': 'Frontal Lobe',
+    'CZ': 'Central Gyrus',
+    'PZ': 'Parietal Lobe'
 }
 
 

@@ -1,6 +1,6 @@
 # Model architecture parameters
 _target_: "NeuroGNN"
-distance_csv_root: ${dataset.data_path}
+distance_csv_root: ${dataset.distance_csv_root}
 distance_csv_path: ${dataset.distances_set}
 max_epochs: ${train.max_epochs}
 

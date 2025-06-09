@@ -676,10 +676,13 @@ class NeuroGNN(EEGTranformer):
             distances_df = pd.read_csv(csv_path)
             dist_adj, _, _ = get_extended_adjacency_matrix(distances_df, INCLUDED_CHANNELS, ELECTRODES_REGIONS)
             initial_sem_embs = get_semantic_embeds()
-            # initial_sem_embs = initial_sem_embs[:19] # TODO Workaround to cut the regions
+
+            # TODO workaround! -> lightning is often intialized with cpu what causes issued because it later changes to the accelrator!
+            # Probably the best way to fix this is to remove all device statements in classes!
             print(f"Device in lightning module {self.device}")
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu") 
             print(f"Selected Device in lightning module {device}")
+
             self.model = NeuroGNN_Classification(cfg, 1, device, dist_adj, initial_sem_embs, meta_node_indices=META_NODE_INDICES)
         
         self.criterion = nn.BCEWithLogitsLoss().to(self.device)

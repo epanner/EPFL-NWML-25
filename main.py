@@ -9,7 +9,7 @@ from omegaconf import DictConfig
 from seiz_eeg.dataset import EEGDataset
 from sklearn.model_selection import train_test_split
 import wandb
-import lightning.pytorch as pl
+import lightning.pytorch as pl  
 from lightning.pytorch.loggers import WandbLogger
 from torch.utils.data import DataLoader
 from submission import generate_submission
@@ -72,6 +72,13 @@ def main(cfg: DictConfig):
     loader_tr = DataLoader(dataset_tr, batch_size=cfg.train.batch_size, shuffle=True)#, num_workers=11)
     if not cfg.train.comp_mode:
         loader_vl = DataLoader(dataset_vl, batch_size=cfg.train.batch_size, shuffle=False)#, num_workers=11)
+
+    # Quick-and-dirty sanity-check
+    batch = next(iter(loader_tr))
+    x = batch[0]
+    print("min / max :", x.min().item(), x.max().item())
+    print("any NaN?  :", torch.isnan(x).any().item())
+    print("any Inf?  :", torch.isinf(x).any().item())
 
     # model = EEGGNN(cfg.model)
     model = MODEL_REGISTRY[cfg.model["_target_"]](cfg.model)

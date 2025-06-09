@@ -86,7 +86,8 @@ def computeFFT(signals, n):
     fourier_signal = fourier_signal[:, :idx_pos]
 
     amp = np.abs(fourier_signal)
-    amp[amp == 0.0] = 1e-8
+    # amp[amp == 0.0] = 1e-8
+    amp = np.maximum(amp, 1e-8)
     return np.log(amp)
 
 def augment_data(x, meta_node_indices):
@@ -106,10 +107,92 @@ def augment_data(x, meta_node_indices):
     x : (max_seq_len, num_nodes, input_dim)  NumPy array
     returns : (max_seq_len, num_nodes + len(meta_node_indices), input_dim)
     """
-    for index_list in meta_node_indices:
-        meta_series = x[:, index_list, :].mean(axis=1, keepdims=True)   # axis=1 → electrodes :contentReference[oaicite:3]{index=3}
-        x = np.concatenate([x, meta_series], axis=1)                    # append along node-axis
-    return x
+    # for index_list in meta_node_indices:
+    #     meta_series = x[:, index_list, :].mean(axis=1, keepdims=True)   # axis=1 → electrodes :contentReference[oaicite:3]{index=3}
+    #     x_2 = np.concatenate([x, meta_series], axis=1) 
+
+    extra = [x[:, idx, :].mean(axis=1, keepdims=True)
+    for idx in meta_node_indices]        # no side-effects
+    x_1 = np.concatenate([x] + extra, axis=1)
+    
+                     # append along node-axis
+    # assert np.allclose(x_1, x_2)
+    return x_1
+
+import numpy as np
+
+
+class StandardScaler:
+    """
+    Parameters
+    ----------
+    mean : array-like
+        Either a scalar or an array shaped (1, num_nodes, 1) holding the
+        per-node mean in the same format used by the original code.
+    std : array-like
+        Matching per-node standard deviation.  A small epsilon is added
+        internally to guard against divide-by-zero.
+    """
+
+    def __init__(self, mean, std):
+        self.mean = np.asarray(mean, dtype=np.float32)
+        self.std = np.asarray(std, dtype=np.float32)
+
+        # optional safety check
+        if np.any(self.std == 0):
+            raise ValueError("std contains zeros; add epsilon or verify input.")
+
+    # ------------------------------------------------------------------ #
+    # Forward transform:  z = (x − μ) / σ
+    # ------------------------------------------------------------------ #
+    def transform(self, data: np.ndarray) -> np.ndarray:
+        """
+        Standardise *data* clip-wise.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            Shape (..., num_nodes, input_dim) – the leading axes can be
+            batch/time; broadcasting handles them automatically.
+
+        Returns
+        -------
+        np.ndarray
+            Standardised array with the same shape as *data*.
+        """
+        return (data - self.mean) / self.std
+
+    # ------------------------------------------------------------------ #
+    # Inverse transform:  x = z⋅σ + μ
+    # ------------------------------------------------------------------ #
+    def inverse_transform(
+        self,
+        data: np.ndarray,
+        mask: np.ndarray | None = None,
+    ) -> np.ndarray:
+        """
+        Revert standardisation; optionally ignore rows given by *mask*.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            Standardised values.
+        mask : np.ndarray or None, optional
+            Boolean array with shape matching the *batch* dimension
+            (e.g. (batch_size,)).  Entries set to True will **not** be
+            inverse-scaled – useful when some clips are padded or invalid.
+
+        Returns
+        -------
+        np.ndarray
+            Unscaled data (same dtype/shape as input).
+        """
+        original = data * self.std + self.mean
+        if mask is not None:
+            # broadcasting mask over all trailing dims
+            original = np.where(mask[..., None, None], data, original)
+        return original
+
 
 class NeuroGNNFilter(Preprocessing):
     def __init__(self,
@@ -142,6 +225,12 @@ class NeuroGNNFilter(Preprocessing):
         self.physical_clip_len = int(self.fs * clip_len)
         self.physical_time_step_size = int(self.fs * time_step_size)
 
+        self.mean = 3.9594627590488702
+        self.std = 1.5625200363244962
+
+        self.scalar = StandardScaler(self.mean, self.std)
+
+        
     def __call__(self, signals: np.ndarray) -> np.ndarray:
         # First transpose to match original format (channels, time)
         signals = signals.T  # Now shape is (n_samples, n_windows)
@@ -160,6 +249,8 @@ class NeuroGNNFilter(Preprocessing):
         filtered = np.stack(time_steps, axis=0)
 
         filtered = augment_data(filtered, META_NODE_INDICES)
+
+        filtered = self.scalar.transform(filtered)
 
         # filtered_turn = filtered.T
         
