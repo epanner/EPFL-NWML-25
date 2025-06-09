@@ -170,7 +170,7 @@ class NeuroGNN_Encoder(nn.Module):
         X_hat = self.layer_norm(X_gnn + X)
         return X_hat, adj_mat, (adj_mat_thresholded, adj_mat_unthresholded, embed_att, dist_adj, mhead_att_mat)
 
-class NeuroGNN_GraphConstructor(nn.Module):
+class   NeuroGNN_GraphConstructor(nn.Module):
     def __init__(self, input_dim, seq_length, nodes_num=19, meta_nodes_num=6,
                  semantic_embs=None, semantic_embs_dim=256,
                  dropout_rate=0.0, leaky_rate=0.2,
@@ -670,7 +670,6 @@ class NeuroGNN(EEGTranformer):
     def __init__(self, cfg, create_model=True):
         super().__init__(cfg, create_model=False)
         self.save_hyperparameters()
-        # device = get_best_device()
 
         if create_model:       
             csv_path = Path(cfg.distance_csv_root) / cfg.distance_csv_path
@@ -679,7 +678,9 @@ class NeuroGNN(EEGTranformer):
             initial_sem_embs = get_semantic_embeds()
             # initial_sem_embs = initial_sem_embs[:19] # TODO Workaround to cut the regions
             print(f"Device in lightning module {self.device}")
-            self.model = NeuroGNN_Classification(cfg, 1, self.device, dist_adj, initial_sem_embs, meta_node_indices=META_NODE_INDICES)
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            print(f"Selected Device in lightning module {device}")
+            self.model = NeuroGNN_Classification(cfg, 1, device, dist_adj, initial_sem_embs, meta_node_indices=META_NODE_INDICES)
         
         self.criterion = nn.BCEWithLogitsLoss().to(self.device)
     def forward(self, x):

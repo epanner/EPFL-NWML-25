@@ -94,7 +94,7 @@ def main(cfg: DictConfig):
         log_every_n_steps=5,
         callbacks=[checkpoint_callback, early_stop_cb],
         gradient_clip_val=cfg.train.gradient_clip_val,
-        num_sanity_val_steps=2
+        num_sanity_val_steps=2,
     )
 
     trainer.fit(model, loader_tr, loader_vl if not cfg.train.comp_mode else None)
