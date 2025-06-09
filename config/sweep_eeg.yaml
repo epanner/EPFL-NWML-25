@@ -1,12 +1,21 @@
 defaults:
   - _self_
-  - eeg_transformer
+  - eeg_transformer_run
+
 
 hydra:
   sweeper:
     params:
-      model.eegnet_kernel_size: 64
-      model.F1: 128
+      model: >-
+        {eegnet_separable_kernel_size:16,eegnet_pooling_1:16,eegnet_pooling_2:10,MSA_num_heads:6},
+        {eegnet_separable_kernel_size:32,eegnet_pooling_1:16,eegnet_pooling_2:10,MSA_num_heads:6},
+        {eegnet_separable_kernel_size:16,eegnet_pooling_1:8 ,eegnet_pooling_2:4 ,MSA_num_heads:3},
+        {eegnet_separable_kernel_size:32,eegnet_pooling_1:8 ,eegnet_pooling_2:4 ,MSA_num_heads:3}
+      
   sweep:
     dir: multirun_logs/${hydra.job.override_dirname}
     subdir: ${hydra.job.num}
+
+
+          # model.eegnet_kernel_size: 32, 64
+      # model.F1: 64, 128

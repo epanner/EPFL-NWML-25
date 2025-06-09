@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import MutableMapping
 import hydra
 import pandas as pd
 import torch
@@ -15,19 +16,19 @@ from torch.utils.data import DataLoader
 from submission import generate_submission
 from model.model import MODEL_REGISTRY
 
-def flatten_dict(d: dict, parent_key: str = "", sep: str = ".") -> dict:
-    items: dict = {}
-    for k, v in d.items():
-        new_key = f"{parent_key}{sep}{k}" if parent_key else k
-        if isinstance(v, dict):
-            items.update(flatten_dict(v, new_key, sep=sep))
+def flatten_dict(dictionary, parent_key='', separator='_'):
+    items = []
+    for key, value in dictionary.items():
+        new_key = parent_key + separator + key if parent_key else key
+        if isinstance(value, MutableMapping):
+            items.extend(flatten_dict(value, new_key, separator=separator).items())
         else:
-            items[new_key] = v
-    return items
-
+            items.append((new_key, value))
+    return dict(items)
 
 @hydra.main(config_path="config", config_name="config", version_base="1.1")
 def main(cfg: DictConfig):
+    print(cfg)
     pl.seed_everything(cfg.train.seed)
 
     transform_fn = create_signal_transformer(cfg.preprocessing.steps)
@@ -60,11 +61,10 @@ def main(cfg: DictConfig):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")                                                                                                                              
-    run_name = f"test_gnn"
     # run_name = f"kernel_size_{cfg.model.eegnet_kernel_size}_f1_{cfg.model.F1}"                                                                                                                                                              
     wandb.init(project="eeg-gnn",
                config=flatten_dict(cfg),
-               name=run_name, 
+               name=cfg.model["_target_"], 
                reinit=True)
     wandb_logger = WandbLogger(project="nml-project", config=dict(cfg))
 

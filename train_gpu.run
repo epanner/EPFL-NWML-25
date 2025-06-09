@@ -15,7 +15,7 @@ source /home/weidinge/miniconda3/etc/profile.d/conda.sh
 eval "$(conda shell.bash hook)"
 conda activate /home/weidinge/miniconda3/envs/nml_project/
 
-path=/home/ogut/d   ata
+path=/home/ogut/d
 
 python main.py \
 dataset.data_path=$path \
