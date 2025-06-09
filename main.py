@@ -107,7 +107,10 @@ def main(cfg: DictConfig):
     trainer.fit(model, loader_tr, loader_vl if not cfg.train.comp_mode else None)
     wandb.save(checkpoint_callback.best_model_path) #TODO auto logging
 
-    generate_submission(cfg, model, transform_fn=transform_fn)
+    best_path = checkpoint_callback.best_model_path
+    best_model = MODEL_REGISTRY[cfg.model["_target_"]].load_from_checkpoint(best_path)
+
+    generate_submission(cfg, best_model, transform_fn=transform_fn)
 
     wandb.finish()
 

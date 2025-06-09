@@ -6,6 +6,7 @@ from seiz_eeg.dataset import EEGDataset
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from model.model import MODEL_REGISTRY
 from preprocessing.preprocessing import create_signal_transformer
 from torch.utils.data import DataLoader
 from omegaconf import OmegaConf
@@ -65,21 +66,21 @@ def generate_submission(cfg, model, transform_fn=None, fix_underscores=False):
     submission_df.to_csv(f"submission/submission_seed_{now}.csv", index=False)
     OmegaConf.save(cfg, f"submission/config_{now}.yaml")
 
-# @hydra.main(config_path="config", config_name="eeg_transformer_run", version_base="1.1")
-# def main(cfg: DictConfig):
-#     pl.seed_everything(cfg.train.seed)
-#     print(cfg.checkpoint_path)
-#     model = EEGGNN_Binary.load_from_checkpoint(cfg.checkpoint_path)
-#     generate_submission(cfg, model, fix_underscores=True)
+@hydra.main(config_path="config", config_name="eeg_transformer_run", version_base="1.1")
+def main(cfg: DictConfig):
+    pl.seed_everything(cfg.train.seed)
+    print(cfg.checkpoint_path)
+    model = MODEL_REGISTRY[cfg.model["_target_"]].load_from_checkpoint(cfg.checkpoint_path, cfg=cfg.model)
+    generate_submission(cfg, model, fix_underscores=True)
 
-# # run like
-# # python submission.py \
-# # +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-2025-05-14_18-56-10.ckpt
-# # python submission.py +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-EEGGNN_Binary-2025-06-03_13-50-20.ckpt
+# run like
+# python submission.py \
+# +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-2025-05-14_18-56-10.ckpt
+# python submission.py --config-name=eeg_gnn_run.yaml +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-NeuroGNN-2025-06-09_16-40-08.ckpt
 
-# # If you want to use different config
-# # --config-path /new/path/to/conf \
+# If you want to use different config
+# --config-path /new/path/to/conf \
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
