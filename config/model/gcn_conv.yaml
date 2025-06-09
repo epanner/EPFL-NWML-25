@@ -1,8 +1,10 @@
-_target_: GraphLSTMNet
+_target_: "GCNLSTM"
 distance_csv_root: ${dataset.distance_csv_root}
 distance_csv_path: ${dataset.distances_set}
+resample_fs: 250
+sequence_length: 12
 
-in_channels: 1
+in_channels: 250
 hidden_channels: 64
 num_layers: 3
 dropout: 0.30
