@@ -12,7 +12,7 @@ max_epochs: ${train.max_epochs}
 # real new ones!
 num_nodes: 19     # Number of nodes in graph.
 rnn_units: 64     # Number of hidden units in DCRNN. TODO not used!
-input_dim: 125    # Input seq feature dim.
+input_dim: 100 #125    # Input seq feature dim.
 gnn_type: "gcn"   # TODO maybe not important?
 max_seq_len: 12   # Maximum sequence length in seconds.
 dropout: 0.0      # Dropout rate for dropout layer before final FC.

@@ -9,6 +9,6 @@
 steps:
   - _target_: neuro_filter
     fs: 250
-    resampleFS: 250
+    resampleFS: 200   # this does resampling -> when you don't wan't resampling use the same fs as above
     time_step_size: 1 # Time step size in seconds.
     clip_len: 12      # EEG clip length in seconds.

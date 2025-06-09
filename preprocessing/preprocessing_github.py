@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.signal import iirnotch, lfilter, butter, filtfilt
+from scipy.signal import iirnotch, lfilter, butter, filtfilt, resample
 from preprocessing.utils import Preprocessing
 from preprocessing.utils import make_a_filtered_plot_for_comparison, plot_signal_in_frequency
 from scipy.fftpack import fft
@@ -217,7 +217,7 @@ class NeuroGNNFilter(Preprocessing):
         """
         self.fs = fs
         self.resampleFS = resampleFS
-        assert self.fs == self.resampleFS
+
         # new
         self.clip_len = clip_len
         self.time_step_size = time_step_size
@@ -229,12 +229,17 @@ class NeuroGNNFilter(Preprocessing):
         self.std = 1.5625200363244962
 
         self.scalar = StandardScaler(self.mean, self.std)
+        self.resample = resampleFS != fs
 
         
     def __call__(self, signals: np.ndarray) -> np.ndarray:
         # First transpose to match original format (channels, time)
         signals = signals.T  # Now shape is (n_samples, n_windows)
         
+        if  self.resample:
+            signals = resample(signals, num=self.resampleFS*self.clip_len, axis=1)
+        
+
         # Create time windows as in original
         time_steps = []
         start_time_step = 0
