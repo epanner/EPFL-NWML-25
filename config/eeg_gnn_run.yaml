@@ -15,7 +15,7 @@ dataset:
 train:
   max_epochs: 100
   batch_size: 40 #Original 1048
-  seed: 42 #2001
+  seed: 2001
   prefetch_dataset: False # If you have enough ram you can switch to true
   gradient_clip_val: 0.5
   comp_mode: False

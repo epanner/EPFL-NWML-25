@@ -1,48 +1,126 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
+from torch_geometric.nn import GCNConv, global_mean_pool         # spatial :contentReference[oaicite:4]{index=4}
 import lightning as pl
+from torchmetrics.classification import BinaryAccuracy, BinaryF1Score  # temporal metrics :contentReference[oaicite:5]{index=5}
 
-class EEGGNN(pl.LightningModule):
-    def __init__(self, cfg):
+
+class GCNEncoder(nn.Module):
+    """Stacked GCN → node embeddings."""
+    def __init__(self, in_channels: int, hidden: int, num_layers: int, dropout: float):
         super().__init__()
-        self.save_hyperparameters()
-        self.convs = torch.nn.ModuleList()
-        self.convs.append(GCNConv(19, cfg.model.hidden_channels))
-        for _ in range(cfg.model.num_layers - 1):
-            self.convs.append(GCNConv(cfg.model.hidden_channels, cfg.model.hidden_channels))
-        self.fc = torch.nn.Linear(cfg.model.hidden_channels, 1)
-        self.dropout = cfg.model.dropout
-        self.lr = cfg.learning_rate
-        self.optimizer_name = cfg.optimizer.name
+        convs = [GCNConv(in_channels, hidden)]
+        convs += [GCNConv(hidden, hidden) for _ in range(num_layers - 1)]
+        self.convs = nn.ModuleList(convs)
+        self.dropout = dropout
 
     def forward(self, x, edge_index):
         for conv in self.convs:
             x = conv(x, edge_index).relu()
-            x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.fc(x.mean(dim=0))  # Pooling (mean)
+            x = F.dropout(x, self.dropout, self.training)
         return x
 
-    def training_step(self, batch, batch_idx):
-        x, y = batch
-        logits = self(x.x, x.edge_index)
-        loss = F.binary_cross_entropy_with_logits(logits.squeeze(), y.float())
-        self.log('train_loss', loss)
+
+class GraphLSTMNet(pl.LightningModule):
+    """
+    Spatial (GCN) + Temporal (Bi-LSTM) network for 12-second EEG clips.
+    Input  shape : (B, T, N, F)
+    Output shape : (B,) logits  (BCEWithLogitsLoss inside)
+    """
+    def __init__(self, cfg):
+        super().__init__()
+        self.save_hyperparameters(cfg)
+
+        H = cfg.model.hidden_channels
+        self.gcn = GCNEncoder(
+            in_channels=cfg.model.in_channels,   #  e.g. 1 after FFT-log amp
+            hidden=H,
+            num_layers=cfg.model.num_layers,
+            dropout=cfg.model.dropout)
+
+        # Temporal block
+        self.lstm = nn.LSTM(
+            input_size=H,
+            hidden_size=H,
+            num_layers=2,
+            bidirectional=True,
+            batch_first=True,
+            dropout=cfg.model.dropout)
+
+        self.classifier = nn.Linear(H * 2, 1)    # 2× for Bi-directional
+        self.criterion = nn.BCEWithLogitsLoss()
+
+        # Metrics
+        self.train_acc = BinaryAccuracy()
+        self.val_acc   = BinaryAccuracy()
+        self.val_f1    = BinaryF1Score()
+
+        # optimiser settings
+        self.lr = cfg.optim.lr
+        self.optimizer_name = cfg.optim.name
+
+    # ------------------------------------------------------------------ #
+    # Forward pass
+    # ------------------------------------------------------------------ #
+    def forward(self, x, edge_index, batch_vec):
+        """
+        x          : (B, T, N, F)
+        edge_index : (2, E) static montage
+        batch_vec  : (B·T·N,) maps each node to its (graph) id
+        """
+        B, T, N, F = x.shape
+        # Flatten B & T ⇒ graphs live in rows
+        x = x.reshape(B * T, N, F).reshape(-1, F)          # node matrix
+        h = self.gcn(x, edge_index)                        # (B·T·N, H)
+
+        # global_mean_pool needs node ↦ graph map
+        h_graph = global_mean_pool(h, batch_vec)           # (B·T, H)
+
+        # restore temporal order and batch
+        h_graph = h_graph.reshape(B, T, -1)                # (B, T, H)
+        lstm_out, _ = self.lstm(h_graph)                   # (B, T, 2H)
+
+        last = lstm_out[:, -1]                             # (B, 2H)
+        return self.classifier(last).squeeze(1)            # (B,)
+
+    # ------------------------------------------------------------------ #
+    # Lightning boiler-plate
+    # ------------------------------------------------------------------ #
+    def common_step(self, batch, stage: str):
+        data, y = batch                                   # adapt to your DataLoader
+        logits = self(data.x, data.edge_index, data.batch)
+        loss   = self.criterion(logits, y.float())
+
+        if stage == "train":
+            self.train_acc.update(torch.sigmoid(logits), y.int())
+            self.log("train_loss", loss, prog_bar=True)
+            self.log("train_acc",  self.train_acc, prog_bar=True)
+        else:
+            self.val_acc.update(torch.sigmoid(logits), y.int())
+            self.val_f1.update(torch.sigmoid(logits), y.int())
+            self.log(f"{stage}_loss", loss, prog_bar=True)
         return loss
 
-    def configure_optimizers(self):
-        optimizer_class = getattr(torch.optim, self.optimizer_name) #raises a error!
-        return optimizer_class(self.parameters(), lr=self.lr)
-    
-    # Spatial then temporal
-    # GNN(GAN, GCNConv, GraphTransformer, Graphspectral, FlatVector) -> (LSTM/GRU, BI-LSTM/GRU, Transformer)
+    def training_step(self, batch, batch_idx):
+        return self.common_step(batch, "train")
 
-    # Was muss noch gemacht werden?
-    # - Graph einlesen
-    # - Configuration ändern -> klomplette Klasse für eine Modelkonfiguration!(Veit)
-    # - Metrics zur Klasse hinzufügen(Veit)
-    # - Chatgpt fragen welche Elememte
-    #   - beste zuerst implementieren
-    #   - Transformer -> 
-    #   - BI-LSTM -> 
-    #
+    def validation_step(self, batch, batch_idx):
+        self.common_step(batch, "val")
+
+    def on_validation_epoch_end(self):
+        self.log("val_acc", self.val_acc.compute(), prog_bar=True)
+        self.log("val_f1",  self.val_f1.compute(),  prog_bar=True)
+        self.val_acc.reset(), self.val_f1.reset()
+
+    # ------------------------------------------------------------------ #
+    # Optimiser & LR scheduler
+    # ------------------------------------------------------------------ #
+    def configure_optimizers(self):
+        try:
+            OptimCls = getattr(torch.optim, self.optimizer_name)   # e.g. "Adam" :contentReference[oaicite:6]{index=6}
+        except AttributeError as e:
+            raise ValueError(f"Unknown optimiser: {self.optimizer_name}") from e
+
+        optimizer = OptimCls(self.parameters(), lr=self.lr)
+        return optimizer

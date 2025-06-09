@@ -19,7 +19,7 @@ dropout: 0.0      # Dropout rate for dropout layer before final FC.
 
 
 optimizer:
-  lr: 1e-4
+  lr: 1e-4        # in paper they use 2e-4
   l2_wd: 5e-4
 
 # python train.py 

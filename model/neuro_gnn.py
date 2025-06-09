@@ -630,7 +630,7 @@ def get_extended_adjacency_matrix(distance_df, sensor_ids, electrodes_regions, d
     distances = meta_dist_mx[~np.isinf(meta_dist_mx)].flatten()
     std = distances.std()
 
-    meta_adj_mat = np.exp(-np.square(meta_dist_mx / std)) #TODO WARNING HERE devision by zero!
+    meta_adj_mat = np.exp(-np.square(meta_dist_mx / std))
     meta_adj_mat[meta_dist_mx > dist_k] = 0
 
     return meta_adj_mat, sensor_id_to_ind, meta_dist_mx

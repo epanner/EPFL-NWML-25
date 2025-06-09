@@ -119,9 +119,6 @@ def augment_data(x, meta_node_indices):
     # assert np.allclose(x_1, x_2)
     return x_1
 
-import numpy as np
-
-
 class StandardScaler:
     """
     Parameters
@@ -222,14 +219,14 @@ class NeuroGNNFilter(Preprocessing):
         self.clip_len = clip_len
         self.time_step_size = time_step_size
 
-        self.physical_clip_len = int(self.fs * clip_len)
-        self.physical_time_step_size = int(self.fs * time_step_size)
-
         self.mean = 3.9594627590488702
         self.std = 1.5625200363244962
 
         self.scalar = StandardScaler(self.mean, self.std)
         self.resample = resampleFS != fs
+
+        self.physical_clip_len = int(self.resampleFS * clip_len)
+        self.physical_time_step_size = int(self.resampleFS * time_step_size)
 
         
     def __call__(self, signals: np.ndarray) -> np.ndarray:
