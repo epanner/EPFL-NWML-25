@@ -1,0 +1,15 @@
+_target_: GraphLSTMNet
+distance_csv_root: ${dataset.distance_csv_root}
+distance_csv_path: ${dataset.distances_set}
+
+in_channels: 1
+hidden_channels: 64
+num_layers: 3
+dropout: 0.30
+
+lstm_layers: 2
+bidirectional: true
+
+optimizer:
+  name: Adam
+  lr: 1e-4

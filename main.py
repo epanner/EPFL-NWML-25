@@ -38,7 +38,7 @@ def main(cfg: DictConfig):
     if not cfg.train.comp_mode:
         clips_tr, clips_val = train_test_split(
             clips_tr,
-            test_size=0.2,        # 20% for validation
+            test_size=cfg.dataset.train_test_split,        # 20% for validation
             random_state=cfg.train.seed,
             shuffle=True,
             stratify=clips_tr['label']  # if you have a label column

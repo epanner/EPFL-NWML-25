@@ -1,0 +1,7 @@
+  _target_: EEGDataset
+  data_path: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/content/networkML"
+  train_set: "train/train"
+  test_set: "test/test"
+  distance_csv_root: "/home/veit/Uni/Lausanne/NML/EPFL-NWML-25"
+  distances_set: "distances_3d.csv"
+  train_test_split: 0.1 #Most of the time we used 0.2
