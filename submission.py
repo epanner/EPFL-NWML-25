@@ -71,12 +71,23 @@ def main(cfg: DictConfig):
     pl.seed_everything(cfg.train.seed)
     print(cfg.checkpoint_path)
     model = MODEL_REGISTRY[cfg.model["_target_"]].load_from_checkpoint(cfg.checkpoint_path, cfg=cfg.model)
-    generate_submission(cfg, model, fix_underscores=True)
-
+    generate_submission(cfg, model)
 # run like
-# python submission.py \
+# python  \
 # +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-2025-05-14_18-56-10.ckpt
-# python submission.py --config-name=eeg_gnn_run.yaml +checkpoint_path=/home/veit/Uni/Lausanne/NML/EPFL-NWML-25/checkpoints/best-checkpoint-NeuroGNN-2025-06-09_16-40-08.ckpt
+# python submission.py --config-name=eeg_gnn_run.yaml 
+
+# python submission.py \
+# dataset.data_path=$path \
+# dataset.train_set=train \
+# dataset.test_set=test \
+# train.prefetch_dataset=True \
+# train.batch_size=256 \
+# train.comp_mode=False \
+# dataset.distance_csv_root=/home/weidinge/EPFL-NWML-25 \
+# +checkpoint_path=/home/weidinge/EPFL-NWML-25/outputs/2025-06-09/16-25-38/checkpoints/best-checkpoint-NeuroGNN-2025-06-09_16-40-08.ckpt \
+# --config-name=eeg_gnn_run.yaml
+
 
 # If you want to use different config
 # --config-path /new/path/to/conf \
