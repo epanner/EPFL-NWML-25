@@ -15,7 +15,7 @@ source /home/weidinge/miniconda3/etc/profile.d/conda.sh
 eval "$(conda shell.bash hook)"
 conda activate /home/weidinge/miniconda3/envs/nml_project/
 
-path=/home/ogut/data
+path=/home/ogut/d   ata
 
 python main.py \
 dataset.data_path=$path \
@@ -24,3 +24,5 @@ dataset.test_set=test \
 train.prefetch_dataset=True \
 train.batch_size=256 \
 train.comp_mode=True
+
+# dataset.data_path=/home/EPFL-NWML-25/content/networkML -> 

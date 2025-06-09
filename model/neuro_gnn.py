@@ -267,6 +267,7 @@ class NeuroGNN_GraphConstructor(nn.Module):
 
         self.to(device) 
         self.device = device
+        print(f"Device GraphConstrutor {device}")
 
 
     # def latent_correlation_layer(self, x):
@@ -381,6 +382,7 @@ class NeuroGNN_GraphConstructor(nn.Module):
         X = weighted_res.permute(0, 1, 2).contiguous()
         X = self.layer_norm3(X)
         if self.semantic_embs is not None:
+            print(self.device)
             init_sem_embs = self.semantic_embs.to(self.device)
             transformed_embeds = self.linear_semantic_embs(init_sem_embs)
             # transformed_embeds = self.semantic_embs_layer_norm(transformed_embeds + init_sem_embs)
@@ -509,7 +511,7 @@ class NeuroGNN_Classification(nn.Module):
 
         self.encoder = NeuroGNN_Encoder(input_dim=enc_input_dim,
                                         seq_length=args.max_seq_len,
-                                        output_dim=self.rnn_units,
+                                         output_dim=self.rnn_units,
                                         dist_adj=dist_adj,
                                         semantic_embs=initial_sem_embeds,
                                         gnn_block_type=self.gnn_type,
@@ -674,7 +676,7 @@ class NeuroGNN(EEGTranformer):
             csv_path = Path(cfg.distance_csv_root) / cfg.distance_csv_path
             distances_df = pd.read_csv(csv_path)
             dist_adj, _, _ = get_extended_adjacency_matrix(distances_df, INCLUDED_CHANNELS, ELECTRODES_REGIONS)
-            initial_sem_embs = get_semantic_embeds()
+            initial_sem_embs = get_semantic_embeds().to(self.device)
             # initial_sem_embs = initial_sem_embs[:19] # TODO Workaround to cut the regions
             
             self.model = NeuroGNN_Classification(cfg, 1, self.device, dist_adj, initial_sem_embs, meta_node_indices=META_NODE_INDICES)
