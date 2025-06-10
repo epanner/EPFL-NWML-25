@@ -19,7 +19,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=3):
     return y
 
 
-class GitHubFilter(Preprocessing):
+class BandpassFFT(Preprocessing):
     def __init__(self,
                  lowcut: float = 0.5,
                  highcut: float = 120.0, 

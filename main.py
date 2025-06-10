@@ -13,7 +13,7 @@ import wandb
 import lightning.pytorch as pl  
 from lightning.pytorch.loggers import WandbLogger
 from torch.utils.data import DataLoader
-from submission import generate_submission
+from helper.submission import generate_submission
 from model.model import MODEL_REGISTRY
 
 def flatten_dict(dictionary, parent_key='', separator='_'):

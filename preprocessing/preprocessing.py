@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import signal
 from preprocessing.utils import Preprocessing
-from preprocessing.preprocessing_github import GitHubFilter, NeuroGNNFilter
+from preprocessing.preprocessing_fft import BandpassFFT, NeuroGNNFilter
 from typing import List
 from functools import reduce
 
@@ -25,7 +25,7 @@ class Identity(Preprocessing):
 PREPROCESSING_REGISTRY = {
     "fft_filter": FFTFilter,
     "identity": Identity,
-    "github_filter": GitHubFilter,
+    "bandpass_filter": BandpassFFT,
     "neuro_filter": NeuroGNNFilter,
 }
 

@@ -1,5 +1,5 @@
 defaults:
-  - preprocessing: github_filter
+  - preprocessing: fft_bandpass_transformer
   - model: eeg_transformer
   - dataset: temple_dataset
   - _self_

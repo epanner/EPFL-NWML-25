@@ -1,5 +1,5 @@
 steps:
-  - _target_: github_filter
+  - _target_: bandpass_filter
     lowcut: 0.5
     highcut: 50 #instead of 120.0
     fs: 250 #instead of 250

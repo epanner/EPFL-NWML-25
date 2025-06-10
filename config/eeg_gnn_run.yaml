@@ -1,6 +1,5 @@
 defaults:
   - preprocessing: fft_gnn
-  # - preprocessing: github_filter
   - model: eeg_gnn
   - dataset: temple_dataset
   - _self_
@@ -8,7 +7,7 @@ defaults:
 # Training settings
 train:
   max_epochs: 100
-  batch_size: 40 #Original 1048
+  batch_size: 40 
   seed: 20010508
   prefetch_dataset: False # If you have enough ram you can switch to true
   gradient_clip_val: 0.5
