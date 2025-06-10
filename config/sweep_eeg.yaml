@@ -7,8 +7,6 @@ hydra:
   sweeper:
     params:
       model: >-
-        {eegnet_separable_kernel_size:16,eegnet_pooling_1:16,eegnet_pooling_2:10,MSA_num_heads:6},
-        {eegnet_separable_kernel_size:32,eegnet_pooling_1:16,eegnet_pooling_2:10,MSA_num_heads:6},
         {eegnet_separable_kernel_size:16,eegnet_pooling_1:8 ,eegnet_pooling_2:4 ,MSA_num_heads:3},
         {eegnet_separable_kernel_size:32,eegnet_pooling_1:8 ,eegnet_pooling_2:4 ,MSA_num_heads:3}
       
