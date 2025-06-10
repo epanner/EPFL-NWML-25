@@ -7,8 +7,8 @@ defaults:
 # Training settings
 train:
   max_epochs: 1000
-  batch_size: 40 #Original 1048
-  seed: 20010508
+  batch_size: 40
+  seed: 42
   prefetch_dataset: False # If you have enough ram you can switch to true
   gradient_clip_val: 0.5
   comp_mode: False
@@ -17,7 +17,7 @@ train:
 early_stopping:
   monitor: "val_loss"
   monitor_comp_mode: "train_loss"
-  patience: 25 #50
+  patience: 25
 
 # Checkpointing
 checkpoint:

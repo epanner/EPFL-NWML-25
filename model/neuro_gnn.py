@@ -138,17 +138,7 @@ class NeuroGNN_Encoder(nn.Module):
                                             conv_num_layers=conv_num_layers)
         else:
             raise ValueError("Not implemented")
-        # elif gnn_block_type.lower() == 'stemgnn':
-        #     self.gnn_block = NeuroGNN_StemGNN_Block(node_feature_dim=self.node_features_dim,
-        #                                             device=device,
-        #                                             output_dim=conv_hidden_dim,
-        #                                             stack_cnt=2,
-        #                                             conv_hidden_dim=conv_hidden_dim)
-        # elif gnn_block_type.lower() == 'graphconv':
-        #     self.gnn_block = NeuroGNN_GNN_GraphConv(node_feature_dim=self.node_features_dim,
-        #                                             device=device,
-        #                                             conv_hidden_dim=conv_hidden_dim,
-        #                                             conv_num_layers=conv_num_layers)
+
         self.layer_norm = nn.LayerNorm(self.conv_hidden_dim)
         self.fc1 = nn.Sequential(
             nn.Linear(self.node_features_dim, self.conv_hidden_dim),
@@ -198,40 +188,20 @@ class   NeuroGNN_GraphConstructor(nn.Module):
         self.layer_norm2 = nn.LayerNorm(512)
         self.time_attention = Attention(self.gru_dim, self.gru_dim)
         self.mhead_attention = nn.MultiheadAttention(self.gru_dim*2, num_heads, dropout_rate, device=device, batch_first=True)
-        # self.GRU_cells = nn.ModuleList(
-        #     nn.GRU(512, gru_dim, batch_first=True, bidirectional=True) for _ in range(self.nodes_num+self.meta_nodes_num)
-        # )
-        # self.GRU_cells = nn.ModuleList(
-        #     BiGRUWithMultiHeadAttention(256, gru_dim, 4) for _ in range(self.nodes_num+self.meta_nodes_num)
-        # )
+
         self.bigru = nn.GRU(512, gru_dim, batch_first=True, bidirectional=True)
-        # self.bigru_layernorm = nn.LayerNorm(gru_dim * 2)
-        # self.bigru = Attentional_BiGRU(512, gru_dim, 4)
-        # self.biGRU_cells = nn.ModuleList(
-        #     nn.GRU(512, gru_dim, batch_first=True, bidirectional=True) for _ in range(len(self.node_cluster_mapping))
-        # )
-            
+
         
-        # self.fc_ta = nn.Linear(gru_dim, self.time_step) #TODO remove this
         self.fc_ta = nn.Linear(gru_dim*2, temporal_embs_dim)
         self.layer_norm3 = nn.LayerNorm(temporal_embs_dim)
         self.layer_norm_sem = nn.LayerNorm(semantic_embs_dim)
-        
-        # for i, cell in enumerate(self.GRU_cells):
-        #     cell.flatten_parameters()
+   
             
 
         self.semantic_embs = torch.from_numpy(semantic_embs).to(device).float()
-        
-        # self.linear_semantic_embs = nn.Sequential(
-        #     nn.Linear(semantic_embs.shape[1], semantic_embs_dim),
-        #     nn.ReLU()
-        # )
+    
         self.linear_semantic_embs = nn.Linear(self.semantic_embs.shape[1], semantic_embs_dim) 
-        # self.semantic_embs_layer_norm = nn.LayerNorm(semantic_embs_dim)
-                
        
-        # self.node_feature_dim = time_step + semantic_embs_dim
         self.node_feature_dim = temporal_embs_dim + semantic_embs_dim
         
     
@@ -268,65 +238,6 @@ class   NeuroGNN_GraphConstructor(nn.Module):
         self.to(device) 
         self.device = device
         print(f"Device GraphConstrutor {device}")
-
-
-    # def latent_correlation_layer(self, x):
-    #     # batch_size, _, node_cnt = x.shape
-    #     batch_size, seq_len, node_cnt, input_dim = x.shape
-    #     # (node_cnt, batch_size, seq_len, input_dim)
-    #     new_x = x.permute(2, 0, 1, 3)
-    #     weighted_res = torch.empty(batch_size, node_cnt, self.gru_dim*2).to(x.get_device())
-    #     for i, cell in enumerate(self.GRU_cells):
-    #         # cell.flatten_parameters()
-    #         cell.flatten_parameters()
-    #         x_sup = self.seq1(new_x[i])
-    #         gru_outputs, hid = cell(x_sup)
-    #         out, hid = cell(x_sup)
-    #         # TODO: multi-layer GRU?
-    #         # hid = hid[-1, :, :]
-    #         # hid = hid.squeeze(0)
-    #         # gru_outputs = gru_outputs.permute(1, 0, 2).contiguous()
-    #         # TODO: to or not to use self-attention?
-    #         # weights = self.time_attention(hid, gru_outputs)
-    #         # updated_weights = weights.unsqueeze(1)
-    #         # gru_outputs = gru_outputs.permute(1, 0, 2)
-    #         # weighted = torch.bmm(updated_weights, gru_outputs)
-    #         # weighted = weighted.squeeze(1)
-    #         # weighted_res[:, i, :] = self.layer_norm(weighted + hid)
-    #         h_n = hid.permute(1, 0, 2)
-    #         weighted_res[:, i, :] = h_n.reshape(batch_size, -1)
-    #     _, attention = self.mhead_attention(weighted_res, weighted_res, weighted_res)
-
-    #     attention = torch.mean(attention, dim=0) #[2000, 2000]
-    #     # TODO: Should I put drop_out for attention?
-    #     # attention = self.drop_out(attention)
-
-    #     return attention, weighted_res
-    
-    # def latent_correlation_layer(self, x):
-    #     # batch_size, _, node_cnt = x.shape
-    #     batch_size, seq_len, node_cnt, input_dim = x.shape
-    #     # (batch_size, node_cnt, seq_len, input_dim)
-    #     new_x = x.permute(0, 2, 1, 3)
-    #     weighted_res = torch.empty(batch_size, node_cnt, self.gru_dim*2).to(x.get_device())
-    #     # get temporal contexts for nodes and meta-nodes
-    #     for i, node_indices in enumerate(self.node_cluster_mapping):
-    #         group_x = new_x[:, node_indices, :, :]
-    #         group_x_reshaped = group_x.reshape(batch_size*len(node_indices), seq_len, input_dim)
-    #         x_sup = self.seq1(group_x_reshaped)
-    #         bigru_cell = self.biGRU_cells[i]
-    #         bigru_cell.flatten_parameters()
-    #         gru_outputs, hid = bigru_cell(x_sup)
-    #         h_n = hid.permute(1, 0, 2)
-    #         h_n_reshaped = h_n.reshape(batch_size, len(node_indices), -1)
-    #         weighted_res[:, node_indices, :] = h_n_reshaped
-    #     weighted_res = self.layer_norm(weighted_res)
-    #     _, attention = self.mhead_attention(weighted_res, weighted_res, weighted_res)
-    #     attention = torch.mean(attention, dim=0) #[2000, 2000]
-    #     # TODO: Should I put drop_out for attention?
-    #     # attention = self.drop_out(attention)
-
-    #     return attention, weighted_res
     
     
     def latent_correlation_layer(self, x):
@@ -352,24 +263,6 @@ class   NeuroGNN_GraphConstructor(nn.Module):
         attention = torch.mean(attention, dim=0) #[2000, 2000]
 
         return attention, h_n_normalized
-    
-    # def latent_correlation_layer(self, x):
-    #     batch_size, seq_len, node_cnt, input_dim = x.shape
-        
-    #     # Reshape x to combine the batch and node dimensions
-    #     # New shape: (batch_size * node_cnt, seq_len, input_dim)
-    #     x_reshaped = x.permute(0, 2, 1, 3).reshape(batch_size * node_cnt, seq_len, input_dim)
-
-    #     # Pass x_reshaped through the desired layers (e.g., self.seq1 and the bigru)
-    #     x_sup = self.seq1(x_reshaped)
-    #     hid = self.bigru(x_sup)
-    #     hid_reshaped = hid.reshape(batch_size, node_cnt, -1)
-
-    #     _, attention = self.mhead_attention(hid_reshaped, hid_reshaped, hid_reshaped)
-
-    #     attention = torch.mean(attention, dim=0) #[2000, 2000]
-
-    #     return attention, hid_reshaped
 
 
     def forward(self, x):
@@ -382,7 +275,6 @@ class   NeuroGNN_GraphConstructor(nn.Module):
         X = weighted_res.permute(0, 1, 2).contiguous()
         X = self.layer_norm3(X)
         if self.semantic_embs is not None:
-            print(self.device)
             init_sem_embs = self.semantic_embs.to(self.device)
             transformed_embeds = self.linear_semantic_embs(init_sem_embs)
             # transformed_embeds = self.semantic_embs_layer_norm(transformed_embeds + init_sem_embs)
@@ -403,9 +295,6 @@ class   NeuroGNN_GraphConstructor(nn.Module):
         adj_mat_thresholded = attention.detach().clone()
         
 
-        # TODO: add softmax for attention?
-        # attention = attention.softmax(dim=1)
-        
         # X: Node features, attention: fused adjacency matrix
         return X, attention, (adj_mat_thresholded, adj_mat_unthresholded, embed_att, self.dist_adj, mhead_att_mat) 
         
@@ -484,10 +373,6 @@ class   NeuroGNN_GraphConstructor(nn.Module):
         sigma = 1.0  # adjust this parameter to control the width of the kernel
         similarity_matrix = torch.exp(-similarity_matrix.pow(2) / (2 * sigma**2))
 
-        # Normalize the similarity matrix by row
-        # row_sum = similarity_matrix.sum(dim=1, keepdim=True)
-        # similarity_matrix_prob = similarity_matrix / row_sum
-        
         # return similarity_matrix
         return similarity_matrix
 

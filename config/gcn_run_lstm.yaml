@@ -1,5 +1,5 @@
 defaults:
-  - preprocessing: github_filter
+  - preprocessing: fft_filter
   - model: gcn_conv
   - dataset: temple_dataset 
   - _self_
@@ -8,7 +8,7 @@ defaults:
 train:
   max_epochs: 1000
   batch_size: 40 #Original 1048
-  seed: 42 #2001
+  seed: 42
   prefetch_dataset: False # If you have enough ram you can switch to true
   gradient_clip_val: 0.5
   comp_mode: False
